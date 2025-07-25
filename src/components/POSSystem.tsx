@@ -211,7 +211,19 @@ const POSSystem = () => {
               {currentStudent && (
                 <div className="p-4 bg-accent/20 rounded-lg border border-accent">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">{currentStudent.name}</h3>
+                    <div className="flex items-center space-x-3">
+                      {currentStudent.photoUrl && (
+                        <img 
+                          src={currentStudent.photoUrl} 
+                          alt={currentStudent.name}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-primary"
+                        />
+                      )}
+                      <div>
+                        <h3 className="font-medium">{currentStudent.name}</h3>
+                        <p className="text-xs text-muted-foreground">RFID: {currentStudent.rfidCardNumber}</p>
+                      </div>
+                    </div>
                     <Badge>{currentStudent.class}</Badge>
                   </div>
                   <div className="space-y-1 text-sm">

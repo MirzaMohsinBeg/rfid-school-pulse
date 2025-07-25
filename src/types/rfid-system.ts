@@ -5,6 +5,7 @@ export interface Student {
   rfidCardNumber: string;
   walletBalance: number;
   isActive: boolean;
+  photoUrl?: string;
   weeklySpendingLimits: {
     tuckShop: number;
     dryFoodShop: number;
@@ -44,7 +45,11 @@ export interface Store {
   id: string;
   name: string;
   type: StoreType;
+  location: string;
   isActive: boolean;
+  requiresMenu: boolean;
+  assignedUserId?: string;
+  assignedUserName?: string;
   inventory: InventoryItem[];
 }
 
@@ -98,4 +103,38 @@ export interface WalletRecharge {
   processedBy: string;
   paymentMethod: 'cash' | 'bank_transfer' | 'cheque';
   referenceNumber?: string;
+}
+
+export interface MenuCombo {
+  id: string;
+  name: string;
+  description: string;
+  items: InventoryItem[];
+  comboPrice: number;
+  isActive: boolean;
+  availableDays: string[];
+}
+
+export interface WeeklyMenu {
+  id: string;
+  weekStartDate: Date;
+  storeType: StoreType;
+  dailyMenus: {
+    [key: string]: { // day of week
+      items: InventoryItem[];
+      combos: MenuCombo[];
+      specialOffers?: string;
+    };
+  };
+  isActive: boolean;
+  createdBy: string;
+  createdAt: Date;
+}
+
+export interface StoreUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'store_manager' | 'cashier' | 'admin';
+  isActive: boolean;
 }

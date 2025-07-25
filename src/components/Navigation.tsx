@@ -10,7 +10,8 @@ import {
   Package, 
   Settings,
   Wallet,
-  Store
+  Store,
+  ChefHat
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -25,7 +26,8 @@ const Navigation = ({ activeModule, onModuleChange }: NavigationProps) => {
     { id: 'pos', name: 'POS System', icon: ShoppingCart, description: 'Point of Sale' },
     { id: 'students', name: 'Student Ledger', icon: Users, description: 'Student Records' },
     { id: 'inventory', name: 'Inventory', icon: Package, description: 'Stock Management' },
-    { id: 'stores', name: 'Store Management', icon: Store, description: 'Store Settings' }
+    { id: 'stores', name: 'Store Management', icon: Store, description: 'Store Settings' },
+    { id: 'menu', name: 'Menu Management', icon: ChefHat, description: 'Weekly Menus' }
   ];
 
   return (

@@ -1,4 +1,4 @@
-import { Student, Transaction, Store, InventoryItem, SpendingLimit } from '@/types/rfid-system';
+import { Student, Transaction, Store, InventoryItem, SpendingLimit, StoreUser, WeeklyMenu, MenuCombo } from '@/types/rfid-system';
 
 export const mockSpendingLimits: SpendingLimit[] = [
   { class: 'Class 6', limits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 } },
@@ -18,6 +18,7 @@ export const mockStudents: Student[] = [
     rfidCardNumber: 'RFID001234',
     walletBalance: 450,
     isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=120&h=120&fit=crop&crop=face',
     weeklySpendingLimits: { tuckShop: 250, dryFoodShop: 250, generalStore: 200 },
     currentWeekSpending: { tuckShop: 120, dryFoodShop: 85, generalStore: 45 },
     lastTransaction: new Date('2024-01-15T14:30:00')
@@ -29,6 +30,7 @@ export const mockStudents: Student[] = [
     rfidCardNumber: 'RFID001235',
     walletBalance: 320,
     isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=120&h=120&fit=crop&crop=face',
     weeklySpendingLimits: { tuckShop: 200, dryFoodShop: 200, generalStore: 150 },
     currentWeekSpending: { tuckShop: 80, dryFoodShop: 60, generalStore: 30 },
     lastTransaction: new Date('2024-01-15T12:15:00')
@@ -40,6 +42,7 @@ export const mockStudents: Student[] = [
     rfidCardNumber: 'RFID001236',
     walletBalance: 180,
     isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1535268647677-300dbf3078d1?w=120&h=120&fit=crop&crop=face',
     weeklySpendingLimits: { tuckShop: 300, dryFoodShop: 300, generalStore: 250 },
     currentWeekSpending: { tuckShop: 220, dryFoodShop: 180, generalStore: 120 },
     lastTransaction: new Date('2024-01-15T16:45:00')
@@ -51,6 +54,7 @@ export const mockStudents: Student[] = [
     rfidCardNumber: 'RFID001237',
     walletBalance: 250,
     isActive: false,
+    photoUrl: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=120&h=120&fit=crop&crop=face',
     weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
     currentWeekSpending: { tuckShop: 50, dryFoodShop: 40, generalStore: 20 },
     lastTransaction: new Date('2024-01-14T10:20:00')
@@ -183,27 +187,76 @@ export const mockInventory: InventoryItem[] = [
   }
 ];
 
+export const mockStoreUsers: StoreUser[] = [
+  { id: 'user_1', name: 'Ram Kumar', email: 'ram@school.edu', role: 'store_manager', isActive: true },
+  { id: 'user_2', name: 'Sita Sharma', email: 'sita@school.edu', role: 'cashier', isActive: true },
+  { id: 'user_3', name: 'Admin User', email: 'admin@school.edu', role: 'admin', isActive: true },
+];
+
 export const mockStores: Store[] = [
   {
     id: 'store_1',
     name: 'Main Tuck Shop',
     type: 'tuckShop',
+    location: 'Ground Floor, Main Building',
     isActive: true,
+    requiresMenu: true,
+    assignedUserId: 'user_1',
+    assignedUserName: 'Ram Kumar',
     inventory: mockInventory.filter(item => item.storeType === 'tuckShop')
   },
   {
     id: 'store_2',
     name: 'Dry Food Shop',
     type: 'dryFoodShop',
+    location: 'First Floor, Main Building',
     isActive: true,
+    requiresMenu: false,
+    assignedUserId: 'user_2',
+    assignedUserName: 'Sita Sharma',
     inventory: mockInventory.filter(item => item.storeType === 'dryFoodShop')
   },
   {
     id: 'store_3',
     name: 'General Store',
     type: 'generalStore',
+    location: 'Hostel Block A',
     isActive: true,
+    requiresMenu: false,
     inventory: mockInventory.filter(item => item.storeType === 'generalStore')
+  }
+];
+
+export const mockWeeklyMenus: WeeklyMenu[] = [
+  {
+    id: 'menu_1',
+    weekStartDate: new Date('2024-01-15'),
+    storeType: 'tuckShop',
+    dailyMenus: {
+      'monday': {
+        items: mockInventory.filter(item => item.storeType === 'tuckShop').slice(0, 2),
+        combos: [
+          {
+            id: 'combo_1',
+            name: 'Healthy Combo',
+            description: 'Fresh fruit salad + Fresh juice',
+            items: mockInventory.filter(item => ['tuck_001', 'tuck_003'].includes(item.id)),
+            comboPrice: 55,
+            isActive: true,
+            availableDays: ['monday', 'wednesday', 'friday']
+          }
+        ],
+        specialOffers: '10% off on fresh items'
+      },
+      'tuesday': {
+        items: mockInventory.filter(item => item.storeType === 'tuckShop'),
+        combos: [],
+        specialOffers: 'Buy 2 get 1 free on sandwiches'
+      }
+    },
+    isActive: true,
+    createdBy: 'Ram Kumar',
+    createdAt: new Date('2024-01-14')
   }
 ];
 
