@@ -12,6 +12,10 @@ export interface Student {
   id: string;
   name: string;
   class: string;
+  section: string;
+  session: string; // Academic session/year (e.g., "2024-25")
+  admissionNumber: string;
+  fatherName?: string;
   rfidCardNumber: string;
   walletBalance: number;
   isActive: boolean;
@@ -28,6 +32,20 @@ export interface Student {
     generalStore: number;
   };
   lastTransaction?: Date;
+}
+
+export interface StudentPromotion {
+  id: string;
+  sessionFrom: string;
+  sessionTo: string;
+  studentsPromoted: {
+    studentId: string;
+    studentName: string;
+    fromClass: string;
+    toClass: string;
+  }[];
+  promotedBy: string;
+  promotedAt: Date;
 }
 
 export interface Transaction {

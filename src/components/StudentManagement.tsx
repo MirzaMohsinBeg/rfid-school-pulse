@@ -25,6 +25,16 @@ const StudentManagement = () => {
   const [isRfidScanOpen, setIsRfidScanOpen] = useState(false);
   const [selectedStudentForCard, setSelectedStudentForCard] = useState<Student | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [classFilter, setClassFilter] = useState('');
+  const [sectionFilter, setSectionFilter] = useState('');
+  const [sessionFilter, setSessionFilter] = useState('');
+  const [isPromotionDialogOpen, setIsPromotionDialogOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState('2024-25');
+  const [promotionData, setPromotionData] = useState({
+    fromSession: '2024-25',
+    toSession: '2025-26',
+    classPromotions: [] as Array<{class: string, promoteToClass: string}>
+  });
   const [scannedCard, setScannedCard] = useState<{id: string, isActive: boolean, previousOwner?: string} | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [deactivationReason, setDeactivationReason] = useState('');
@@ -39,16 +49,24 @@ const StudentManagement = () => {
     fatherName: '',
     class: '',
     section: '',
+    session: '2024-25',
     photoUrl: '',
     rfidCardNumber: '',
     walletBalance: 0
   });
 
-  const filteredStudents = students.filter(student =>
-    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.rfidCardNumber.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredStudents = students.filter(student => {
+    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.rfidCardNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.admissionNumber.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesClass = !classFilter || student.class === classFilter;
+    const matchesSection = !sectionFilter || student.section === sectionFilter;
+    const matchesSession = !sessionFilter || student.session === sessionFilter;
+    
+    return matchesSearch && matchesClass && matchesSection && matchesSession;
+  });
 
   const resetForm = () => {
     setFormData({
@@ -57,6 +75,7 @@ const StudentManagement = () => {
       fatherName: '',
       class: '',
       section: '',
+      session: '2024-25',
       photoUrl: '',
       rfidCardNumber: '',
       walletBalance: 0
@@ -76,7 +95,11 @@ const StudentManagement = () => {
     const newStudent: Student = {
       id: `student-${Date.now()}`,
       name: formData.name,
-      class: `${formData.class}-${formData.section}`,
+      class: formData.class,
+      section: formData.section,
+      session: formData.session,
+      admissionNumber: formData.admissionNumber,
+      fatherName: formData.fatherName,
       rfidCardNumber: formData.rfidCardNumber || `RFID-${Date.now()}`,
       walletBalance: formData.walletBalance,
       isActive: true,
@@ -125,7 +148,11 @@ const StudentManagement = () => {
     const updatedStudent: Student = {
       ...selectedStudent,
       name: formData.name,
-      class: `${formData.class}-${formData.section}`,
+      class: formData.class,
+      section: formData.section,
+      session: formData.session,
+      admissionNumber: formData.admissionNumber,
+      fatherName: formData.fatherName,
       rfidCardNumber: formData.rfidCardNumber,
       walletBalance: formData.walletBalance,
       photoUrl: formData.photoUrl
@@ -260,13 +287,13 @@ const StudentManagement = () => {
 
   const openEditDialog = (student: Student) => {
     setSelectedStudent(student);
-    const [className, section] = student.class.split('-');
     setFormData({
-      admissionNumber: student.id, // Using ID as admission number for demo
+      admissionNumber: student.admissionNumber,
       name: student.name,
-      fatherName: 'Father Name', // Mock data doesn't have father name
-      class: className,
-      section: section || '',
+      fatherName: student.fatherName || '',
+      class: student.class,
+      section: student.section,
+      session: student.session,
       photoUrl: student.photoUrl || '',
       rfidCardNumber: student.rfidCardNumber,
       walletBalance: student.walletBalance
@@ -288,6 +315,80 @@ const StudentManagement = () => {
     }
     return null;
   };
+
+  const handlePromoteStudents = () => {
+    if (!promotionData.classPromotions.length) {
+      toast({
+        title: 'Error',
+        description: 'Please configure class promotions',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const promotedStudents: Array<{studentId: string, studentName: string, fromClass: string, toClass: string}> = [];
+    
+    const updatedStudents = students.map(student => {
+      if (student.session === promotionData.fromSession) {
+        const promotion = promotionData.classPromotions.find(p => p.class === student.class);
+        if (promotion) {
+          promotedStudents.push({
+            studentId: student.id,
+            studentName: student.name,
+            fromClass: student.class,
+            toClass: promotion.promoteToClass
+          });
+          
+          return {
+            ...student,
+            class: promotion.promoteToClass,
+            session: promotionData.toSession,
+            currentWeekSpending: {
+              tuckShop: 0,
+              dryFoodShop: 0,
+              generalStore: 0
+            }
+          };
+        }
+      }
+      return student;
+    });
+
+    setStudents(updatedStudents);
+    setIsPromotionDialogOpen(false);
+    
+    toast({
+      title: 'Students Promoted Successfully',
+      description: `${promotedStudents.length} students promoted from ${promotionData.fromSession} to ${promotionData.toSession}`,
+    });
+  };
+
+  const addClassPromotion = () => {
+    setPromotionData(prev => ({
+      ...prev,
+      classPromotions: [...prev.classPromotions, { class: '', promoteToClass: '' }]
+    }));
+  };
+
+  const updateClassPromotion = (index: number, field: 'class' | 'promoteToClass', value: string) => {
+    setPromotionData(prev => ({
+      ...prev,
+      classPromotions: prev.classPromotions.map((item, i) => 
+        i === index ? { ...item, [field]: value } : item
+      )
+    }));
+  };
+
+  const removeClassPromotion = (index: number) => {
+    setPromotionData(prev => ({
+      ...prev,
+      classPromotions: prev.classPromotions.filter((_, i) => i !== index)
+    }));
+  };
+
+  const getUniqueClasses = () => [...new Set(students.map(s => s.class))].sort();
+  const getUniqueSections = () => [...new Set(students.map(s => s.section))].filter(Boolean).sort();
+  const getUniqueSessions = () => [...new Set(students.map(s => s.session))].sort();
 
   const StudentForm = ({ isEdit = false }: { isEdit?: boolean }) => (
     <div className="grid gap-4 py-4">
@@ -336,7 +437,7 @@ const StudentManagement = () => {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="class">Class *</Label>
-          <Select onValueChange={(value) => setFormData(prev => ({ ...prev, class: value }))}>
+          <Select value={formData.class} onValueChange={(value) => setFormData(prev => ({ ...prev, class: value }))}>
             <SelectTrigger>
               <SelectValue placeholder="Select class" />
             </SelectTrigger>
@@ -353,7 +454,7 @@ const StudentManagement = () => {
         </div>
         <div>
           <Label htmlFor="section">Section</Label>
-          <Select onValueChange={(value) => setFormData(prev => ({ ...prev, section: value }))}>
+          <Select value={formData.section} onValueChange={(value) => setFormData(prev => ({ ...prev, section: value }))}>
             <SelectTrigger>
               <SelectValue placeholder="Select section" />
             </SelectTrigger>
@@ -365,6 +466,23 @@ const StudentManagement = () => {
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="session">Academic Session *</Label>
+          <Select value={formData.session} onValueChange={(value) => setFormData(prev => ({ ...prev, session: value }))}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select session" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="2023-24">2023-24</SelectItem>
+              <SelectItem value="2024-25">2024-25</SelectItem>
+              <SelectItem value="2025-26">2025-26</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div></div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -443,20 +561,149 @@ const StudentManagement = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="mb-4">
-                <Input
-                  placeholder="Search students by name, class, or RFID number..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="max-w-sm"
-                />
+              <div className="mb-4 space-y-4">
+                <div className="flex flex-wrap gap-4">
+                  <Input
+                    placeholder="Search students by name, class, admission number..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="max-w-sm"
+                  />
+                  <Select value={classFilter} onValueChange={setClassFilter}>
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="All Classes" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All Classes</SelectItem>
+                      {getUniqueClasses().map(cls => (
+                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={sectionFilter} onValueChange={setSectionFilter}>
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="All Sections" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All Sections</SelectItem>
+                      {getUniqueSections().map(section => (
+                        <SelectItem key={section} value={section}>Section {section}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={sessionFilter} onValueChange={setSessionFilter}>
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="All Sessions" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All Sessions</SelectItem>
+                      {getUniqueSessions().map(session => (
+                        <SelectItem key={session} value={session}>{session}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Dialog open={isPromotionDialogOpen} onOpenChange={setIsPromotionDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="ml-auto">
+                        <Users className="h-4 w-4 mr-2" />
+                        Promote Students
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Student Promotion/Rollover</DialogTitle>
+                        <DialogDescription>
+                          Promote students to the next academic session and class
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>From Session</Label>
+                            <Select value={promotionData.fromSession} onValueChange={(value) => 
+                              setPromotionData(prev => ({ ...prev, fromSession: value }))}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="2023-24">2023-24</SelectItem>
+                                <SelectItem value="2024-25">2024-25</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label>To Session</Label>
+                            <Select value={promotionData.toSession} onValueChange={(value) => 
+                              setPromotionData(prev => ({ ...prev, toSession: value }))}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="2024-25">2024-25</SelectItem>
+                                <SelectItem value="2025-26">2025-26</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <Label>Class Promotion Rules</Label>
+                            <Button size="sm" onClick={addClassPromotion}>Add Rule</Button>
+                          </div>
+                          {promotionData.classPromotions.map((promotion, index) => (
+                            <div key={index} className="flex gap-2 items-center mb-2">
+                              <Select value={promotion.class} onValueChange={(value) => 
+                                updateClassPromotion(index, 'class', value)}>
+                                <SelectTrigger className="flex-1">
+                                  <SelectValue placeholder="From Class" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {getUniqueClasses().map(cls => (
+                                    <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <span>→</span>
+                              <Select value={promotion.promoteToClass} onValueChange={(value) => 
+                                updateClassPromotion(index, 'promoteToClass', value)}>
+                                <SelectTrigger className="flex-1">
+                                  <SelectValue placeholder="To Class" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="7">Class 7</SelectItem>
+                                  <SelectItem value="8">Class 8</SelectItem>
+                                  <SelectItem value="9">Class 9</SelectItem>
+                                  <SelectItem value="10">Class 10</SelectItem>
+                                  <SelectItem value="11">Class 11</SelectItem>
+                                  <SelectItem value="12">Class 12</SelectItem>
+                                  <SelectItem value="GRADUATED">Graduated</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button size="sm" variant="destructive" onClick={() => removeClassPromotion(index)}>
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex justify-end space-x-2">
+                        <Button variant="outline" onClick={() => setIsPromotionDialogOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={handlePromoteStudents}>Promote Students</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
               
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Student</TableHead>
-                    <TableHead>Class</TableHead>
+                    <TableHead>Class/Section</TableHead>
+                    <TableHead>Session</TableHead>
                     <TableHead>RFID Card</TableHead>
                     <TableHead>Wallet Balance</TableHead>
                     <TableHead>Status</TableHead>
@@ -475,11 +722,21 @@ const StudentManagement = () => {
                           </Avatar>
                           <div>
                             <div className="font-medium">{student.name}</div>
-                            <div className="text-sm text-muted-foreground">ID: {student.id}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {student.admissionNumber} | {student.fatherName}
+                            </div>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{student.class}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">Class {student.class}</div>
+                          <div className="text-sm text-muted-foreground">Section {student.section}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{student.session}</Badge>
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           <span className="font-mono text-sm">{student.rfidCardNumber}</span>
