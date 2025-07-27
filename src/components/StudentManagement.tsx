@@ -574,7 +574,7 @@ const StudentManagement = () => {
                       <SelectValue placeholder="All Classes" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Classes</SelectItem>
+                      <SelectItem value="all">All Classes</SelectItem>
                       {getUniqueClasses().map(cls => (
                         <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
                       ))}
@@ -585,7 +585,7 @@ const StudentManagement = () => {
                       <SelectValue placeholder="All Sections" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Sections</SelectItem>
+                      <SelectItem value="all">All Sections</SelectItem>
                       {getUniqueSections().map(section => (
                         <SelectItem key={section} value={section}>Section {section}</SelectItem>
                       ))}
@@ -596,7 +596,7 @@ const StudentManagement = () => {
                       <SelectValue placeholder="All Sessions" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Sessions</SelectItem>
+                      <SelectItem value="all">All Sessions</SelectItem>
                       {getUniqueSessions().map(session => (
                         <SelectItem key={session} value={session}>{session}</SelectItem>
                       ))}
