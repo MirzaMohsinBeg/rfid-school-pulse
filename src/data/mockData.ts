@@ -457,14 +457,14 @@ export const mockInventory: InventoryItem[] = [
     category: 'Snacks',
     price: 15,
     stock: 50,
+    minStockLevel: 10,
     storeType: 'tuckShop',
     nutritionalInfo: {
       calories: 262,
       protein: 3.7,
       carbs: 28,
       fat: 15
-    },
-    imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=150&h=150&fit=crop'
+    }
   },
   {
     id: 'tuck_2',
@@ -472,16 +472,14 @@ export const mockInventory: InventoryItem[] = [
     category: 'Snacks',
     price: 25,
     stock: 30,
+    minStockLevel: 5,
     storeType: 'tuckShop',
-    isAvailable: true,
     nutritionalInfo: {
       calories: 300,
       protein: 12,
       carbs: 35,
-      fat: 12,
-      fiber: 3
-    },
-    imageUrl: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=150&h=150&fit=crop'
+      fat: 12
+    }
   },
   {
     id: 'tuck_3',
@@ -489,16 +487,14 @@ export const mockInventory: InventoryItem[] = [
     category: 'Beverages',
     price: 20,
     stock: 40,
+    minStockLevel: 8,
     storeType: 'tuckShop',
-    isAvailable: true,
     nutritionalInfo: {
       calories: 110,
       protein: 1,
       carbs: 26,
-      fat: 0.3,
-      fiber: 0.5
-    },
-    imageUrl: 'https://images.unsplash.com/photo-1534353473418-4cfa6c56fd72?w=150&h=150&fit=crop'
+      fat: 0.3
+    }
   },
   {
     id: 'tuck_4',
@@ -506,16 +502,14 @@ export const mockInventory: InventoryItem[] = [
     category: 'Snacks',
     price: 10,
     stock: 60,
+    minStockLevel: 15,
     storeType: 'tuckShop',
-    isAvailable: true,
     nutritionalInfo: {
       calories: 150,
       protein: 2,
       carbs: 20,
-      fat: 7,
-      fiber: 1
-    },
-    imageUrl: 'https://images.unsplash.com/photo-1486887396153-fa416526c108?w=150&h=150&fit=crop'
+      fat: 7
+    }
   },
 
   // Dry Food Shop Items
@@ -525,9 +519,8 @@ export const mockInventory: InventoryItem[] = [
     category: 'Quick Meals',
     price: 12,
     stock: 100,
-    storeType: 'dryFoodShop',
-    isAvailable: true,
-    imageUrl: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=150&h=150&fit=crop'
+    minStockLevel: 20,
+    storeType: 'dryFoodShop'
   },
   {
     id: 'dry_2',
@@ -535,9 +528,8 @@ export const mockInventory: InventoryItem[] = [
     category: 'Snacks',
     price: 15,
     stock: 80,
-    storeType: 'dryFoodShop',
-    isAvailable: true,
-    imageUrl: 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=150&h=150&fit=crop'
+    minStockLevel: 15,
+    storeType: 'dryFoodShop'
   },
   {
     id: 'dry_3',
@@ -545,9 +537,8 @@ export const mockInventory: InventoryItem[] = [
     category: 'Healthy Snacks',
     price: 18,
     stock: 45,
-    storeType: 'dryFoodShop',
-    isAvailable: true,
-    imageUrl: 'https://images.unsplash.com/photo-1560925643-ca3371ba6751?w=150&h=150&fit=crop'
+    minStockLevel: 10,
+    storeType: 'dryFoodShop'
   },
 
   // General Store Items
@@ -557,9 +548,8 @@ export const mockInventory: InventoryItem[] = [
     category: 'Stationery',
     price: 30,
     stock: 200,
-    storeType: 'generalStore',
-    isAvailable: true,
-    imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=150&h=150&fit=crop'
+    minStockLevel: 50,
+    storeType: 'generalStore'
   },
   {
     id: 'gen_2',
@@ -567,9 +557,8 @@ export const mockInventory: InventoryItem[] = [
     category: 'Stationery',
     price: 25,
     stock: 150,
-    storeType: 'generalStore',
-    isAvailable: true,
-    imageUrl: 'https://images.unsplash.com/photo-1586952518485-11b180e92764?w=150&h=150&fit=crop'
+    minStockLevel: 30,
+    storeType: 'generalStore'
   },
   {
     id: 'gen_3',
@@ -577,9 +566,8 @@ export const mockInventory: InventoryItem[] = [
     category: 'Utilities',
     price: 35,
     stock: 75,
-    storeType: 'generalStore',
-    isAvailable: true,
-    imageUrl: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=150&h=150&fit=crop'
+    minStockLevel: 20,
+    storeType: 'generalStore'
   }
 ];
 
@@ -589,27 +577,21 @@ export const mockStoreUsers: StoreUser[] = [
     name: 'Ram Kumar',
     role: 'store_manager',
     email: 'ram.kumar@school.edu',
-    assignedStores: ['store_1'],
-    isActive: true,
-    lastLogin: new Date('2024-01-15T09:30:00')
+    isActive: true
   },
   {
     id: 'store_user_2',
     name: 'Sita Devi',
-    role: 'Cashier',
+    role: 'cashier',
     email: 'sita.devi@school.edu',
-    assignedStores: ['store_2'],
-    isActive: true,
-    lastLogin: new Date('2024-01-15T10:45:00')
+    isActive: true
   },
   {
     id: 'store_user_3',
     name: 'Mohan Singh',
-    role: 'Store Keeper',
+    role: 'admin',
     email: 'mohan.singh@school.edu',
-    assignedStores: ['store_3'],
-    isActive: true,
-    lastLogin: new Date('2024-01-15T08:15:00')
+    isActive: true
   }
 ];
 
@@ -620,102 +602,98 @@ export const mockStores: Store[] = [
     type: 'tuckShop',
     location: 'Ground Floor, Building A',
     assignedUserId: 'store_user_1',
-    inventoryItems: mockInventory.filter(item => item.storeType === 'tuckShop'),
+    assignedUserName: 'Ram Kumar',
+    requiresMenu: true,
     isActive: true,
-    operatingHours: {
-      start: '08:00',
-      end: '16:00'
-    }
+    inventory: mockInventory.filter(item => item.storeType === 'tuckShop')
   },
   {
     id: 'store_2',
     name: 'Dry Food Corner',
     type: 'dryFoodShop',
     location: 'First Floor, Building B',
-    assignedUser: 'store_user_2',
-    inventoryItems: mockInventory.filter(item => item.storeType === 'dryFoodShop'),
+    assignedUserId: 'store_user_2',
+    assignedUserName: 'Sita Devi',
+    requiresMenu: false,
     isActive: true,
-    operatingHours: {
-      start: '09:00',
-      end: '17:00'
-    }
+    inventory: mockInventory.filter(item => item.storeType === 'dryFoodShop')
   },
   {
     id: 'store_3',
     name: 'General Store',
     type: 'generalStore',
     location: 'Ground Floor, Building C',
-    assignedUser: 'store_user_3',
-    inventoryItems: mockInventory.filter(item => item.storeType === 'generalStore'),
+    assignedUserId: 'store_user_3',
+    assignedUserName: 'Mohan Singh',
+    requiresMenu: false,
     isActive: true,
-    operatingHours: {
-      start: '08:30',
-      end: '16:30'
-    }
+    inventory: mockInventory.filter(item => item.storeType === 'generalStore')
   }
 ];
 
 export const mockWeeklyMenus: WeeklyMenu[] = [
   {
     id: 'menu_1',
-    storeId: 'store_1',
     weekStartDate: new Date('2024-01-15'),
-    weekEndDate: new Date('2024-01-21'),
+    storeType: 'tuckShop',
     dailyMenus: {
-      monday: {
-        items: ['tuck_1', 'tuck_2', 'tuck_3'],
+      Monday: {
+        items: mockInventory.filter(item => ['tuck_1', 'tuck_2', 'tuck_3'].includes(item.id)),
         combos: [
           {
             id: 'combo_1',
             name: 'Snack Combo',
-            items: ['tuck_1', 'tuck_3'],
-            originalPrice: 35,
-            discountedPrice: 30,
-            description: 'Samosa + Fresh Juice'
+            description: 'Samosa + Fresh Juice',
+            items: mockInventory.filter(item => ['tuck_1', 'tuck_3'].includes(item.id)),
+            comboPrice: 30,
+            isActive: true,
+            availableDays: ['Monday']
           }
         ],
-        specialOffers: ['Buy 2 Sandwiches, Get 1 Cookie Free']
+        specialOffers: 'Buy 2 Sandwiches, Get 1 Cookie Free'
       },
-      tuesday: {
-        items: ['tuck_2', 'tuck_4', 'tuck_3'],
-        combos: [],
-        specialOffers: []
+      Tuesday: {
+        items: mockInventory.filter(item => ['tuck_2', 'tuck_4', 'tuck_3'].includes(item.id)),
+        combos: []
       },
-      wednesday: {
-        items: ['tuck_1', 'tuck_2', 'tuck_3', 'tuck_4'],
+      Wednesday: {
+        items: mockInventory.filter(item => ['tuck_1', 'tuck_2', 'tuck_3', 'tuck_4'].includes(item.id)),
         combos: [
           {
             id: 'combo_2',
             name: 'Full Meal',
-            items: ['tuck_2', 'tuck_3', 'tuck_4'],
-            originalPrice: 55,
-            discountedPrice: 45,
-            description: 'Sandwich + Juice + Cookies'
+            description: 'Sandwich + Juice + Cookies',
+            items: mockInventory.filter(item => ['tuck_2', 'tuck_3', 'tuck_4'].includes(item.id)),
+            comboPrice: 45,
+            isActive: true,
+            availableDays: ['Wednesday']
           }
         ],
-        specialOffers: ['20% off on Fresh Juice']
+        specialOffers: '20% off on Fresh Juice'
       },
-      thursday: {
-        items: ['tuck_1', 'tuck_4'],
-        combos: [],
-        specialOffers: []
+      Thursday: {
+        items: mockInventory.filter(item => ['tuck_1', 'tuck_4'].includes(item.id)),
+        combos: []
       },
-      friday: {
-        items: ['tuck_1', 'tuck_2', 'tuck_3', 'tuck_4'],
+      Friday: {
+        items: mockInventory.filter(item => ['tuck_1', 'tuck_2', 'tuck_3', 'tuck_4'].includes(item.id)),
         combos: [
           {
             id: 'combo_3',
             name: 'Weekend Special',
-            items: ['tuck_1', 'tuck_2', 'tuck_3'],
-            originalPrice: 60,
-            discountedPrice: 50,
-            description: 'Samosa + Sandwich + Fresh Juice'
+            description: 'Samosa + Sandwich + Fresh Juice',
+            items: mockInventory.filter(item => ['tuck_1', 'tuck_2', 'tuck_3'].includes(item.id)),
+            comboPrice: 50,
+            isActive: true,
+            availableDays: ['Friday']
           }
         ],
-        specialOffers: ['Free Cookie with any purchase above ₹40']
+        specialOffers: 'Free Cookie with any purchase above ₹40'
       }
     },
-    isActive: true
+    isActive: true,
+    createdBy: 'Admin User',
+    createdAt: new Date('2024-01-15T08:00:00')
   }
 ];
 
@@ -723,38 +701,41 @@ export const mockTransactions: Transaction[] = [
   {
     id: 'txn_1',
     studentId: '1',
-    storeId: 'store_1',
+    studentName: 'Arjun Sharma',
+    storeType: 'tuckShop',
+    amount: 30,
     items: [
-      { id: 'tuck_1', quantity: 2, unitPrice: 15, totalPrice: 30 }
+      { id: 'tuck_1', name: 'Samosa', price: 15, quantity: 2, category: 'Snacks' }
     ],
-    totalAmount: 30,
     timestamp: new Date('2024-01-15T10:30:00'),
-    paymentMethod: 'RFID Wallet',
-    status: 'completed'
+    balanceAfter: 420,
+    receiptNumber: 'RCP001'
   },
   {
     id: 'txn_2',
     studentId: '2',
-    storeId: 'store_2',
+    studentName: 'Priya Gupta',
+    storeType: 'dryFoodShop',
+    amount: 27,
     items: [
-      { itemId: 'dry_1', quantity: 1, unitPrice: 12, totalPrice: 12 },
-      { itemId: 'dry_2', quantity: 1, unitPrice: 15, totalPrice: 15 }
+      { id: 'dry_1', name: 'Instant Noodles', price: 12, quantity: 1, category: 'Quick Meals' },
+      { id: 'dry_2', name: 'Biscuit Pack', price: 15, quantity: 1, category: 'Snacks' }
     ],
-    totalAmount: 27,
     timestamp: new Date('2024-01-15T11:45:00'),
-    paymentMethod: 'RFID Wallet',
-    status: 'completed'
+    balanceAfter: 293,
+    receiptNumber: 'RCP002'
   },
   {
     id: 'txn_3',
     studentId: '3',
-    storeId: 'store_3',
+    studentName: 'Rohit Singh',
+    storeType: 'generalStore',
+    amount: 90,
     items: [
-      { itemId: 'gen_1', quantity: 3, unitPrice: 30, totalPrice: 90 }
+      { id: 'gen_1', name: 'Notebook', price: 30, quantity: 3, category: 'Stationery' }
     ],
-    totalAmount: 90,
     timestamp: new Date('2024-01-15T14:20:00'),
-    paymentMethod: 'RFID Wallet',
-    status: 'completed'
+    balanceAfter: 190,
+    receiptNumber: 'RCP003'
   }
 ];
