@@ -7,6 +7,7 @@ import StudentLedger from '@/components/StudentLedger';
 import InventoryManagement from '@/components/InventoryManagement';
 import StoreManagement from '@/components/StoreManagement';
 import MenuManagement from '@/components/MenuManagement';
+import Settings from '@/components/Settings';
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState('dashboard');
@@ -27,6 +28,8 @@ const Index = () => {
         return <StoreManagement />;
       case 'menu':
         return <MenuManagement />;
+      case 'settings':
+        return <Settings />;
       default:
         return <Dashboard />;
     }

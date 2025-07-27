@@ -70,7 +70,14 @@ const Navigation = ({ activeModule, onModuleChange }: NavigationProps) => {
       </nav>
       
       <div className="pt-4 border-t border-border">
-        <Button variant="ghost" className="w-full justify-start" size="sm">
+        <Button 
+          variant={activeModule === 'settings' ? 'default' : 'ghost'} 
+          className={`w-full justify-start ${
+            activeModule === 'settings' ? 'bg-primary text-primary-foreground' : ''
+          }`} 
+          size="sm"
+          onClick={() => onModuleChange('settings')}
+        >
           <Settings className="h-4 w-4 mr-2" />
           Settings
         </Button>
