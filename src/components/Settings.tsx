@@ -5,10 +5,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Palette, Monitor, Save, RefreshCw } from 'lucide-react';
+import { Palette, Monitor, Save, RefreshCw, Users } from 'lucide-react';
+import StudentManagement from './StudentManagement';
 
 const Settings = () => {
   const [selectedTheme, setSelectedTheme] = useState('doon-school');
+  const [activeTab, setActiveTab] = useState('themes');
   const { toast } = useToast();
 
   const themes = [
@@ -111,6 +113,32 @@ const Settings = () => {
         <p className="text-muted-foreground">Customize your application preferences</p>
       </div>
 
+      <div className="flex space-x-4 border-b">
+        <button
+          onClick={() => setActiveTab('themes')}
+          className={`px-4 py-2 border-b-2 transition-colors ${
+            activeTab === 'themes' 
+              ? 'border-primary text-primary' 
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Design Themes
+        </button>
+        <button
+          onClick={() => setActiveTab('students')}
+          className={`px-4 py-2 border-b-2 transition-colors ${
+            activeTab === 'students' 
+              ? 'border-primary text-primary' 
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Student Management
+        </button>
+      </div>
+
+      {activeTab === 'themes' && (
+        <div className="space-y-6">
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -196,6 +224,10 @@ const Settings = () => {
           </div>
         </CardContent>
       </Card>
+        </div>
+      )}
+
+      {activeTab === 'students' && <StudentManagement />}
     </div>
   );
 };
