@@ -21,7 +21,11 @@ const StudentManagement = () => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isRfidScanOpen, setIsRfidScanOpen] = useState(false);
+  const [selectedStudentForCard, setSelectedStudentForCard] = useState<Student | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [scannedCard, setScannedCard] = useState<{id: string, isActive: boolean, previousOwner?: string} | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
   const { toast } = useToast();
 
   // Form state for student data
@@ -152,18 +156,52 @@ const StudentManagement = () => {
     });
   };
 
-  const handleIssueNewCard = (studentId: string) => {
-    const newCardNumber = `RFID-NEW-${Date.now()}`;
+  const handleIssueNewCard = (student: Student) => {
+    setSelectedStudentForCard(student);
+    setScannedCard(null);
+    setIsScanning(false);
+    setIsRfidScanOpen(true);
+  };
+
+  const simulateCardScan = () => {
+    setIsScanning(true);
+    
+    // Simulate scanning delay
+    setTimeout(() => {
+      const cardId = `RFID-${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+      const mockCard = {
+        id: cardId,
+        isActive: true,
+        previousOwner: Math.random() > 0.7 ? 'Previous Student Name' : undefined
+      };
+      
+      setScannedCard(mockCard);
+      setIsScanning(false);
+      
+      toast({
+        title: 'Card Scanned Successfully',
+        description: `Card ${cardId} detected`,
+      });
+    }, 2000);
+  };
+
+  const assignScannedCard = () => {
+    if (!scannedCard || !selectedStudentForCard) return;
+
     setStudents(prev => prev.map(student => 
-      student.id === studentId 
-        ? { ...student, isActive: true, rfidCardNumber: newCardNumber }
+      student.id === selectedStudentForCard.id 
+        ? { ...student, isActive: true, rfidCardNumber: scannedCard.id }
         : student
     ));
     
     toast({
-      title: 'New RFID Card Issued',
-      description: `New card number: ${newCardNumber}`,
+      title: 'RFID Card Assigned',
+      description: `Card ${scannedCard.id} has been assigned to ${selectedStudentForCard.name}`,
     });
+
+    setIsRfidScanOpen(false);
+    setSelectedStudentForCard(null);
+    setScannedCard(null);
   };
 
   const openEditDialog = (student: Student) => {
@@ -434,7 +472,7 @@ const StudentManagement = () => {
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
-                                  onClick={() => handleIssueNewCard(student.id)}
+                                  onClick={() => handleIssueNewCard(student)}
                                 >
                                   <CreditCard className="h-3 w-3" />
                                 </Button>
@@ -477,6 +515,95 @@ const StudentManagement = () => {
               </Table>
             </CardContent>
           </Card>
+
+          {/* RFID Card Scanning Dialog */}
+          <Dialog open={isRfidScanOpen} onOpenChange={setIsRfidScanOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Issue New RFID Card</DialogTitle>
+                <DialogDescription>
+                  Scan or read the RFID card to assign to {selectedStudentForCard?.name}
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="text-center">
+                  <div className="mx-auto w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-4">
+                    <CreditCard className="h-12 w-12 text-white" />
+                  </div>
+                  
+                  {!scannedCard && !isScanning && (
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Place the RFID card near the scanner
+                      </p>
+                      <Button onClick={simulateCardScan} className="w-full">
+                        Start Scanning
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {isScanning && (
+                    <div className="space-y-3">
+                      <div className="animate-pulse">
+                        <div className="h-2 bg-blue-200 rounded-full">
+                          <div className="h-2 bg-blue-600 rounded-full animate-ping"></div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-blue-600 font-medium">Scanning RFID card...</p>
+                    </div>
+                  )}
+                  
+                  {scannedCard && (
+                    <div className="space-y-4">
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div className="flex items-center justify-center mb-2">
+                          <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                          <span className="text-green-800 font-medium">Card Detected</span>
+                        </div>
+                        
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Card ID:</span>
+                            <span className="font-mono font-bold">{scannedCard.id}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Status:</span>
+                            <Badge variant={scannedCard.isActive ? "default" : "secondary"}>
+                              {scannedCard.isActive ? "Active" : "Inactive"}
+                            </Badge>
+                          </div>
+                          {scannedCard.previousOwner && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Previous Owner:</span>
+                              <span className="text-orange-600">{scannedCard.previousOwner}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {scannedCard.previousOwner && (
+                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                          <p className="text-orange-800 text-sm">
+                            ⚠️ This card was previously assigned to another student. Proceeding will transfer ownership.
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="flex space-x-2">
+                        <Button variant="outline" onClick={simulateCardScan} className="flex-1">
+                          Scan Again
+                        </Button>
+                        <Button onClick={assignScannedCard} className="flex-1">
+                          Assign Card
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         <TabsContent value="bulk-upload" className="space-y-4">
