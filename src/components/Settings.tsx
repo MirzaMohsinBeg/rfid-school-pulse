@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Palette, Monitor, Save, RefreshCw, Users } from 'lucide-react';
 import StudentManagement from './StudentManagement';
+import UserManagement from './UserManagement';
 
 const Settings = () => {
   const [selectedTheme, setSelectedTheme] = useState('doon-school');
@@ -134,6 +135,16 @@ const Settings = () => {
         >
           Student Management
         </button>
+        <button
+          onClick={() => setActiveTab('users')}
+          className={`px-4 py-2 border-b-2 transition-colors ${
+            activeTab === 'users' 
+              ? 'border-primary text-primary' 
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          User Management
+        </button>
       </div>
 
       {activeTab === 'themes' && (
@@ -228,6 +239,7 @@ const Settings = () => {
       )}
 
       {activeTab === 'students' && <StudentManagement />}
+      {activeTab === 'users' && <UserManagement />}
     </div>
   );
 };
