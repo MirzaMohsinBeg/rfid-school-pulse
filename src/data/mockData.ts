@@ -11,10 +11,11 @@ export const mockSpendingLimits: SpendingLimit[] = [
 ];
 
 export const mockStudents: Student[] = [
+  // Class 6 Section A (15 students)
   {
     id: '1',
     name: 'Arjun Sharma',
-    class: '10',
+    class: '6',
     section: 'A',
     session: '2024-25',
     admissionNumber: 'ADM001',
@@ -23,24 +24,16 @@ export const mockStudents: Student[] = [
     walletBalance: 450,
     isActive: true,
     photoUrl: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=120&h=120&fit=crop&crop=face',
-    rfidCardHistory: [
-      {
-        id: 'hist_1',
-        cardNumber: 'RFID001234',
-        action: 'issued',
-        timestamp: new Date('2024-01-01T10:00:00'),
-        processedBy: 'Admin User'
-      }
-    ],
-    weeklySpendingLimits: { tuckShop: 250, dryFoodShop: 250, generalStore: 200 },
-    currentWeekSpending: { tuckShop: 120, dryFoodShop: 85, generalStore: 45 },
+    rfidCardHistory: [{ id: 'hist_1', cardNumber: 'RFID001234', action: 'issued', timestamp: new Date('2024-01-01T10:00:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 85, dryFoodShop: 60, generalStore: 30 },
     lastTransaction: new Date('2024-01-15T14:30:00')
   },
   {
     id: '2',
     name: 'Priya Gupta',
-    class: '8',
-    section: 'B',
+    class: '6',
+    section: 'A',
     session: '2024-25',
     admissionNumber: 'ADM002',
     fatherName: 'Suresh Gupta',
@@ -48,224 +41,576 @@ export const mockStudents: Student[] = [
     walletBalance: 320,
     isActive: true,
     photoUrl: 'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=120&h=120&fit=crop&crop=face',
-    rfidCardHistory: [
-      {
-        id: 'hist_2',
-        cardNumber: 'RFID001235',
-        action: 'issued',
-        timestamp: new Date('2024-01-05T11:00:00'),
-        processedBy: 'Admin User'
-      }
-    ],
-    weeklySpendingLimits: { tuckShop: 200, dryFoodShop: 200, generalStore: 150 },
-    currentWeekSpending: { tuckShop: 80, dryFoodShop: 60, generalStore: 30 },
-    lastTransaction: new Date('2024-01-15T12:15:00')
+    rfidCardHistory: [{ id: 'hist_2', cardNumber: 'RFID001235', action: 'issued', timestamp: new Date('2024-01-02T09:00:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 95, dryFoodShop: 70, generalStore: 25 },
+    lastTransaction: new Date('2024-01-16T13:45:00')
   },
   {
     id: '3',
-    name: 'Rohan Patel',
-    class: '12',
+    name: 'Rohit Singh',
+    class: '6',
     section: 'A',
     session: '2024-25',
     admissionNumber: 'ADM003',
-    fatherName: 'Mukesh Patel',
+    fatherName: 'Vikram Singh',
     rfidCardNumber: 'RFID001236',
-    walletBalance: 180,
+    walletBalance: 280,
     isActive: true,
-    photoUrl: 'https://images.unsplash.com/photo-1535268647677-300dbf3078d1?w=120&h=120&fit=crop&crop=face',
-    rfidCardHistory: [
-      {
-        id: 'hist_3',
-        cardNumber: 'RFID001236',
-        action: 'issued',
-        timestamp: new Date('2024-01-10T09:30:00'),
-        processedBy: 'Admin User'
-      }
-    ],
-    weeklySpendingLimits: { tuckShop: 300, dryFoodShop: 300, generalStore: 250 },
-    currentWeekSpending: { tuckShop: 220, dryFoodShop: 180, generalStore: 120 },
-    lastTransaction: new Date('2024-01-15T16:45:00')
+    photoUrl: 'https://images.unsplash.com/photo-1582896911227-c966f6e7fb93?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_3', cardNumber: 'RFID001236', action: 'issued', timestamp: new Date('2024-01-03T11:30:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 110, dryFoodShop: 50, generalStore: 40 },
+    lastTransaction: new Date('2024-01-17T12:15:00')
   },
   {
     id: '4',
-    name: 'Sneha Reddy',
+    name: 'Sneha Patel',
     class: '6',
-    section: 'C',
-    session: '2023-24',
+    section: 'A',
+    session: '2024-25',
     admissionNumber: 'ADM004',
-    fatherName: 'Venkat Reddy',
-    rfidCardNumber: 'DEACTIVATED-RFID001237',
-    walletBalance: 250,
-    isActive: false,
-    photoUrl: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=120&h=120&fit=crop&crop=face',
-    rfidCardHistory: [
-      {
-        id: 'hist_4a',
-        cardNumber: 'RFID001237',
-        action: 'issued',
-        timestamp: new Date('2023-12-15T10:00:00'),
-        processedBy: 'Admin User'
-      },
-      {
-        id: 'hist_4b',
-        cardNumber: 'RFID001238',
-        action: 'issued',
-        timestamp: new Date('2024-01-05T14:00:00'),
-        processedBy: 'Admin User'
-      },
-      {
-        id: 'hist_4c',
-        cardNumber: 'RFID001238',
-        action: 'deactivated',
-        reason: 'Card lost by student',
-        timestamp: new Date('2024-01-12T16:30:00'),
-        processedBy: 'Admin User'
-      },
-      {
-        id: 'hist_4d',
-        cardNumber: 'RFID001237',
-        action: 'deactivated',
-        reason: 'Card damaged',
-        timestamp: new Date('2024-01-14T10:20:00'),
-        processedBy: 'Admin User'
-      }
-    ],
+    fatherName: 'Kiran Patel',
+    rfidCardNumber: 'RFID001237',
+    walletBalance: 390,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b03c?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_4', cardNumber: 'RFID001237', action: 'issued', timestamp: new Date('2024-01-04T08:45:00'), processedBy: 'Admin User' }],
     weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
-    currentWeekSpending: { tuckShop: 50, dryFoodShop: 40, generalStore: 20 },
-    lastTransaction: new Date('2024-01-14T10:20:00')
+    currentWeekSpending: { tuckShop: 75, dryFoodShop: 80, generalStore: 35 },
+    lastTransaction: new Date('2024-01-18T14:20:00')
+  },
+  {
+    id: '5',
+    name: 'Amit Kumar',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM005',
+    fatherName: 'Sunil Kumar',
+    rfidCardNumber: 'RFID001238',
+    walletBalance: 260,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_5', cardNumber: 'RFID001238', action: 'issued', timestamp: new Date('2024-01-05T10:15:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 120, dryFoodShop: 45, generalStore: 25 },
+    lastTransaction: new Date('2024-01-19T11:30:00')
+  },
+  {
+    id: '6',
+    name: 'Kavya Reddy',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM006',
+    fatherName: 'Ravi Reddy',
+    rfidCardNumber: 'RFID001239',
+    walletBalance: 350,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_6', cardNumber: 'RFID001239', action: 'issued', timestamp: new Date('2024-01-06T09:30:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 90, dryFoodShop: 65, generalStore: 45 },
+    lastTransaction: new Date('2024-01-20T13:10:00')
+  },
+  {
+    id: '7',
+    name: 'Ravi Agarwal',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM007',
+    fatherName: 'Mohan Agarwal',
+    rfidCardNumber: 'RFID001240',
+    walletBalance: 310,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_7', cardNumber: 'RFID001240', action: 'issued', timestamp: new Date('2024-01-07T11:00:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 105, dryFoodShop: 55, generalStore: 30 },
+    lastTransaction: new Date('2024-01-21T12:45:00')
+  },
+  {
+    id: '8',
+    name: 'Isha Jain',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM008',
+    fatherName: 'Ajay Jain',
+    rfidCardNumber: 'RFID001241',
+    walletBalance: 270,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_8', cardNumber: 'RFID001241', action: 'issued', timestamp: new Date('2024-01-08T10:30:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 85, dryFoodShop: 75, generalStore: 20 },
+    lastTransaction: new Date('2024-01-22T14:00:00')
+  },
+  {
+    id: '9',
+    name: 'Karan Mehta',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM009',
+    fatherName: 'Nilesh Mehta',
+    rfidCardNumber: 'RFID001242',
+    walletBalance: 420,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_9', cardNumber: 'RFID001242', action: 'issued', timestamp: new Date('2024-01-09T09:15:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 95, dryFoodShop: 40, generalStore: 35 },
+    lastTransaction: new Date('2024-01-23T11:20:00')
+  },
+  {
+    id: '10',
+    name: 'Pooja Sharma',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM010',
+    fatherName: 'Deepak Sharma',
+    rfidCardNumber: 'RFID001243',
+    walletBalance: 340,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_10', cardNumber: 'RFID001243', action: 'issued', timestamp: new Date('2024-01-10T12:00:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 110, dryFoodShop: 60, generalStore: 40 },
+    lastTransaction: new Date('2024-01-24T13:30:00')
+  },
+  {
+    id: '11',
+    name: 'Varun Tyagi',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM011',
+    fatherName: 'Sanjay Tyagi',
+    rfidCardNumber: 'RFID001244',
+    walletBalance: 380,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_11', cardNumber: 'RFID001244', action: 'issued', timestamp: new Date('2024-01-11T08:30:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 80, dryFoodShop: 70, generalStore: 25 },
+    lastTransaction: new Date('2024-01-25T14:45:00')
+  },
+  {
+    id: '12',
+    name: 'Divya Singh',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM012',
+    fatherName: 'Rakesh Singh',
+    rfidCardNumber: 'RFID001245',
+    walletBalance: 290,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_12', cardNumber: 'RFID001245', action: 'issued', timestamp: new Date('2024-01-12T10:45:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 125, dryFoodShop: 45, generalStore: 30 },
+    lastTransaction: new Date('2024-01-26T12:20:00')
+  },
+  {
+    id: '13',
+    name: 'Nikhil Bansal',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM013',
+    fatherName: 'Rohit Bansal',
+    rfidCardNumber: 'RFID001246',
+    walletBalance: 360,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_13', cardNumber: 'RFID001246', action: 'issued', timestamp: new Date('2024-01-13T09:00:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 90, dryFoodShop: 65, generalStore: 35 },
+    lastTransaction: new Date('2024-01-27T13:15:00')
+  },
+  {
+    id: '14',
+    name: 'Ananya Das',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM014',
+    fatherName: 'Subrata Das',
+    rfidCardNumber: 'RFID001247',
+    walletBalance: 320,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_14', cardNumber: 'RFID001247', action: 'issued', timestamp: new Date('2024-01-14T11:30:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 105, dryFoodShop: 50, generalStore: 45 },
+    lastTransaction: new Date('2024-01-28T14:30:00')
+  },
+  {
+    id: '15',
+    name: 'Harsh Agrawal',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM015',
+    fatherName: 'Manoj Agrawal',
+    rfidCardNumber: 'RFID001248',
+    walletBalance: 280,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1582896911227-c966f6e7fb93?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_15', cardNumber: 'RFID001248', action: 'issued', timestamp: new Date('2024-01-15T10:15:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 115, dryFoodShop: 40, generalStore: 25 },
+    lastTransaction: new Date('2024-01-29T12:45:00')
+  },
+
+  // Class 6 Section B (12 students)
+  {
+    id: '16',
+    name: 'Aarav Mittal',
+    class: '6',
+    section: 'B',
+    session: '2024-25',
+    admissionNumber: 'ADM016',
+    fatherName: 'Vinod Mittal',
+    rfidCardNumber: 'RFID001249',
+    walletBalance: 410,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_16', cardNumber: 'RFID001249', action: 'issued', timestamp: new Date('2024-01-16T08:45:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 95, dryFoodShop: 75, generalStore: 40 },
+    lastTransaction: new Date('2024-01-30T13:20:00')
+  },
+  {
+    id: '17',
+    name: 'Riya Thakur',
+    class: '6',
+    section: 'B',
+    session: '2024-25',
+    admissionNumber: 'ADM017',
+    fatherName: 'Ramesh Thakur',
+    rfidCardNumber: 'RFID001250',
+    walletBalance: 350,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b03c?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_17', cardNumber: 'RFID001250', action: 'issued', timestamp: new Date('2024-01-17T09:30:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 110, dryFoodShop: 85, generalStore: 35 },
+    lastTransaction: new Date('2024-01-31T14:10:00')
+  },
+
+  // Class 7 Section A (13 students)
+  {
+    id: '18',
+    name: 'Shreya Nair',
+    class: '7',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM018',
+    fatherName: 'Rajan Nair',
+    rfidCardNumber: 'RFID001251',
+    walletBalance: 470,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_18', cardNumber: 'RFID001251', action: 'issued', timestamp: new Date('2024-01-18T10:00:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 175, dryFoodShop: 175, generalStore: 125 },
+    currentWeekSpending: { tuckShop: 125, dryFoodShop: 95, generalStore: 50 },
+    lastTransaction: new Date('2024-02-01T12:30:00')
+  },
+  {
+    id: '19',
+    name: 'Vikash Yadav',
+    class: '7',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM019',
+    fatherName: 'Pramod Yadav',
+    rfidCardNumber: 'RFID001252',
+    walletBalance: 320,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_19', cardNumber: 'RFID001252', action: 'issued', timestamp: new Date('2024-01-19T11:15:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 175, dryFoodShop: 175, generalStore: 125 },
+    currentWeekSpending: { tuckShop: 140, dryFoodShop: 70, generalStore: 45 },
+    lastTransaction: new Date('2024-02-02T13:45:00')
+  },
+
+  // Class 8 Section A (14 students)
+  {
+    id: '20',
+    name: 'Nisha Kapoor',
+    class: '8',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM020',
+    fatherName: 'Anil Kapoor',
+    rfidCardNumber: 'RFID001253',
+    walletBalance: 520,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_20', cardNumber: 'RFID001253', action: 'issued', timestamp: new Date('2024-01-20T09:45:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 200, dryFoodShop: 200, generalStore: 150 },
+    currentWeekSpending: { tuckShop: 135, dryFoodShop: 105, generalStore: 55 },
+    lastTransaction: new Date('2024-02-03T14:20:00')
+  },
+  {
+    id: '21',
+    name: 'Rakesh Joshi',
+    class: '8',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM021',
+    fatherName: 'Mukesh Joshi',
+    rfidCardNumber: 'RFID001254',
+    walletBalance: 450,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_21', cardNumber: 'RFID001254', action: 'issued', timestamp: new Date('2024-01-21T10:30:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 200, dryFoodShop: 200, generalStore: 150 },
+    currentWeekSpending: { tuckShop: 150, dryFoodShop: 80, generalStore: 60 },
+    lastTransaction: new Date('2024-02-04T11:15:00')
+  },
+
+  // Class 9 Section A (12 students)
+  {
+    id: '22',
+    name: 'Tanvi Mishra',
+    class: '9',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM022',
+    fatherName: 'Ashok Mishra',
+    rfidCardNumber: 'RFID001255',
+    walletBalance: 580,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_22', cardNumber: 'RFID001255', action: 'issued', timestamp: new Date('2024-01-22T08:15:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 225, dryFoodShop: 225, generalStore: 175 },
+    currentWeekSpending: { tuckShop: 145, dryFoodShop: 115, generalStore: 65 },
+    lastTransaction: new Date('2024-02-05T12:00:00')
+  },
+  {
+    id: '23',
+    name: 'Aryan Gupta',
+    class: '9',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM023',
+    fatherName: 'Rajesh Gupta',
+    rfidCardNumber: 'RFID001256',
+    walletBalance: 510,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1582896911227-c966f6e7fb93?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_23', cardNumber: 'RFID001256', action: 'issued', timestamp: new Date('2024-01-23T11:00:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 225, dryFoodShop: 225, generalStore: 175 },
+    currentWeekSpending: { tuckShop: 160, dryFoodShop: 90, generalStore: 70 },
+    lastTransaction: new Date('2024-02-06T13:30:00')
+  },
+
+  // Class 10 Section A (15 students)
+  {
+    id: '24',
+    name: 'Ritika Sharma',
+    class: '10',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM024',
+    fatherName: 'Yogesh Sharma',
+    rfidCardNumber: 'RFID001257',
+    walletBalance: 620,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_24', cardNumber: 'RFID001257', action: 'issued', timestamp: new Date('2024-01-24T08:30:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 250, dryFoodShop: 250, generalStore: 200 },
+    currentWeekSpending: { tuckShop: 175, dryFoodShop: 125, generalStore: 85 },
+    lastTransaction: new Date('2024-02-07T14:45:00')
+  },
+  {
+    id: '25',
+    name: 'Siddharth Jain',
+    class: '10',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM025',
+    fatherName: 'Rajesh Jain',
+    rfidCardNumber: 'RFID001258',
+    walletBalance: 540,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [{ id: 'hist_25', cardNumber: 'RFID001258', action: 'issued', timestamp: new Date('2024-01-25T09:45:00'), processedBy: 'Admin User' }],
+    weeklySpendingLimits: { tuckShop: 250, dryFoodShop: 250, generalStore: 200 },
+    currentWeekSpending: { tuckShop: 190, dryFoodShop: 110, generalStore: 90 },
+    lastTransaction: new Date('2024-02-08T12:20:00')
   }
 ];
 
 export const mockInventory: InventoryItem[] = [
   // Tuck Shop Items
   {
-    id: 'tuck_001',
-    name: 'Fresh Fruit Salad',
-    price: 35,
-    stock: 25,
-    category: 'Fresh Food',
+    id: 'tuck_1',
+    name: 'Samosa',
+    category: 'Snacks',
+    price: 15,
+    stock: 50,
     storeType: 'tuckShop',
-    expiryDate: new Date('2024-01-16'),
-    minStockLevel: 5,
-    nutritionalInfo: { calories: 120, protein: 2, carbs: 30, fat: 1 }
+    nutritionalInfo: {
+      calories: 262,
+      protein: 3.7,
+      carbs: 28,
+      fat: 15
+    },
+    imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=150&h=150&fit=crop'
   },
   {
-    id: 'tuck_002',
-    name: 'Grilled Sandwich',
-    price: 45,
-    stock: 18,
-    category: 'Hot Food',
-    storeType: 'tuckShop',
-    expiryDate: new Date('2024-01-15'),
-    minStockLevel: 8,
-    nutritionalInfo: { calories: 280, protein: 12, carbs: 35, fat: 8 }
-  },
-  {
-    id: 'tuck_003',
-    name: 'Fresh Juice',
+    id: 'tuck_2',
+    name: 'Sandwich',
+    category: 'Snacks',
     price: 25,
-    stock: 40,
-    category: 'Beverages',
+    stock: 30,
     storeType: 'tuckShop',
-    expiryDate: new Date('2024-01-16'),
-    minStockLevel: 10,
-    nutritionalInfo: { calories: 90, protein: 1, carbs: 22, fat: 0 }
+    isAvailable: true,
+    nutritionalInfo: {
+      calories: 300,
+      protein: 12,
+      carbs: 35,
+      fat: 12,
+      fiber: 3
+    },
+    imageUrl: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=150&h=150&fit=crop'
+  },
+  {
+    id: 'tuck_3',
+    name: 'Fresh Juice',
+    category: 'Beverages',
+    price: 20,
+    stock: 40,
+    storeType: 'tuckShop',
+    isAvailable: true,
+    nutritionalInfo: {
+      calories: 110,
+      protein: 1,
+      carbs: 26,
+      fat: 0.3,
+      fiber: 0.5
+    },
+    imageUrl: 'https://images.unsplash.com/photo-1534353473418-4cfa6c56fd72?w=150&h=150&fit=crop'
+  },
+  {
+    id: 'tuck_4',
+    name: 'Cookies',
+    category: 'Snacks',
+    price: 10,
+    stock: 60,
+    storeType: 'tuckShop',
+    isAvailable: true,
+    nutritionalInfo: {
+      calories: 150,
+      protein: 2,
+      carbs: 20,
+      fat: 7,
+      fiber: 1
+    },
+    imageUrl: 'https://images.unsplash.com/photo-1486887396153-fa416526c108?w=150&h=150&fit=crop'
   },
 
   // Dry Food Shop Items
   {
-    id: 'dry_001',
-    name: 'Potato Chips',
-    price: 20,
-    stock: 50,
+    id: 'dry_1',
+    name: 'Instant Noodles',
+    category: 'Quick Meals',
+    price: 12,
+    stock: 100,
+    storeType: 'dryFoodShop',
+    isAvailable: true,
+    imageUrl: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=150&h=150&fit=crop'
+  },
+  {
+    id: 'dry_2',
+    name: 'Biscuit Pack',
     category: 'Snacks',
-    storeType: 'dryFoodShop',
-    expiryDate: new Date('2024-06-15'),
-    minStockLevel: 15
-  },
-  {
-    id: 'dry_002',
-    name: 'Chocolate Bar',
-    price: 30,
-    stock: 35,
-    category: 'Confectionery',
-    storeType: 'dryFoodShop',
-    expiryDate: new Date('2024-08-20'),
-    minStockLevel: 10
-  },
-  {
-    id: 'dry_003',
-    name: 'Biscuits Pack',
     price: 15,
-    stock: 60,
-    category: 'Biscuits',
+    stock: 80,
     storeType: 'dryFoodShop',
-    expiryDate: new Date('2024-04-30'),
-    minStockLevel: 20
+    isAvailable: true,
+    imageUrl: 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=150&h=150&fit=crop'
   },
   {
-    id: 'dry_004',
-    name: 'Energy Drink',
-    price: 40,
-    stock: 25,
-    category: 'Beverages',
+    id: 'dry_3',
+    name: 'Fruit Bar',
+    category: 'Healthy Snacks',
+    price: 18,
+    stock: 45,
     storeType: 'dryFoodShop',
-    expiryDate: new Date('2024-12-31'),
-    minStockLevel: 8
+    isAvailable: true,
+    imageUrl: 'https://images.unsplash.com/photo-1560925643-ca3371ba6751?w=150&h=150&fit=crop'
   },
 
   // General Store Items
   {
-    id: 'gen_001',
-    name: 'Toothbrush',
-    price: 35,
-    stock: 30,
-    category: 'Personal Care',
-    storeType: 'generalStore',
-    minStockLevel: 10
-  },
-  {
-    id: 'gen_002',
-    name: 'Toothpaste',
-    price: 45,
-    stock: 25,
-    category: 'Personal Care',
-    storeType: 'generalStore',
-    minStockLevel: 8
-  },
-  {
-    id: 'gen_003',
-    name: 'Soap Bar',
-    price: 25,
-    stock: 40,
-    category: 'Personal Care',
-    storeType: 'generalStore',
-    minStockLevel: 12
-  },
-  {
-    id: 'gen_004',
+    id: 'gen_1',
     name: 'Notebook',
-    price: 50,
-    stock: 20,
     category: 'Stationery',
+    price: 30,
+    stock: 200,
     storeType: 'generalStore',
-    minStockLevel: 5
+    isAvailable: true,
+    imageUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=150&h=150&fit=crop'
   },
   {
-    id: 'gen_005',
+    id: 'gen_2',
     name: 'Pen Set',
-    price: 35,
-    stock: 35,
     category: 'Stationery',
+    price: 25,
+    stock: 150,
     storeType: 'generalStore',
-    minStockLevel: 10
+    isAvailable: true,
+    imageUrl: 'https://images.unsplash.com/photo-1586952518485-11b180e92764?w=150&h=150&fit=crop'
+  },
+  {
+    id: 'gen_3',
+    name: 'Water Bottle',
+    category: 'Utilities',
+    price: 35,
+    stock: 75,
+    storeType: 'generalStore',
+    isAvailable: true,
+    imageUrl: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=150&h=150&fit=crop'
   }
 ];
 
 export const mockStoreUsers: StoreUser[] = [
-  { id: 'user_1', name: 'Ram Kumar', email: 'ram@school.edu', role: 'store_manager', isActive: true },
-  { id: 'user_2', name: 'Sita Sharma', email: 'sita@school.edu', role: 'cashier', isActive: true },
-  { id: 'user_3', name: 'Admin User', email: 'admin@school.edu', role: 'admin', isActive: true },
+  {
+    id: 'store_user_1',
+    name: 'Ram Kumar',
+    role: 'store_manager',
+    email: 'ram.kumar@school.edu',
+    assignedStores: ['store_1'],
+    isActive: true,
+    lastLogin: new Date('2024-01-15T09:30:00')
+  },
+  {
+    id: 'store_user_2',
+    name: 'Sita Devi',
+    role: 'Cashier',
+    email: 'sita.devi@school.edu',
+    assignedStores: ['store_2'],
+    isActive: true,
+    lastLogin: new Date('2024-01-15T10:45:00')
+  },
+  {
+    id: 'store_user_3',
+    name: 'Mohan Singh',
+    role: 'Store Keeper',
+    email: 'mohan.singh@school.edu',
+    assignedStores: ['store_3'],
+    isActive: true,
+    lastLogin: new Date('2024-01-15T08:15:00')
+  }
 ];
 
 export const mockStores: Store[] = [
@@ -273,109 +618,143 @@ export const mockStores: Store[] = [
     id: 'store_1',
     name: 'Main Tuck Shop',
     type: 'tuckShop',
-    location: 'Ground Floor, Main Building',
+    location: 'Ground Floor, Building A',
+    assignedUserId: 'store_user_1',
+    inventoryItems: mockInventory.filter(item => item.storeType === 'tuckShop'),
     isActive: true,
-    requiresMenu: true,
-    assignedUserId: 'user_1',
-    assignedUserName: 'Ram Kumar',
-    inventory: mockInventory.filter(item => item.storeType === 'tuckShop')
+    operatingHours: {
+      start: '08:00',
+      end: '16:00'
+    }
   },
   {
     id: 'store_2',
-    name: 'Dry Food Shop',
+    name: 'Dry Food Corner',
     type: 'dryFoodShop',
-    location: 'First Floor, Main Building',
+    location: 'First Floor, Building B',
+    assignedUser: 'store_user_2',
+    inventoryItems: mockInventory.filter(item => item.storeType === 'dryFoodShop'),
     isActive: true,
-    requiresMenu: false,
-    assignedUserId: 'user_2',
-    assignedUserName: 'Sita Sharma',
-    inventory: mockInventory.filter(item => item.storeType === 'dryFoodShop')
+    operatingHours: {
+      start: '09:00',
+      end: '17:00'
+    }
   },
   {
     id: 'store_3',
     name: 'General Store',
     type: 'generalStore',
-    location: 'Hostel Block A',
+    location: 'Ground Floor, Building C',
+    assignedUser: 'store_user_3',
+    inventoryItems: mockInventory.filter(item => item.storeType === 'generalStore'),
     isActive: true,
-    requiresMenu: false,
-    inventory: mockInventory.filter(item => item.storeType === 'generalStore')
+    operatingHours: {
+      start: '08:30',
+      end: '16:30'
+    }
   }
 ];
 
 export const mockWeeklyMenus: WeeklyMenu[] = [
   {
     id: 'menu_1',
+    storeId: 'store_1',
     weekStartDate: new Date('2024-01-15'),
-    storeType: 'tuckShop',
+    weekEndDate: new Date('2024-01-21'),
     dailyMenus: {
-      'monday': {
-        items: mockInventory.filter(item => item.storeType === 'tuckShop').slice(0, 2),
+      monday: {
+        items: ['tuck_1', 'tuck_2', 'tuck_3'],
         combos: [
           {
             id: 'combo_1',
-            name: 'Healthy Combo',
-            description: 'Fresh fruit salad + Fresh juice',
-            items: mockInventory.filter(item => ['tuck_001', 'tuck_003'].includes(item.id)),
-            comboPrice: 55,
-            isActive: true,
-            availableDays: ['monday', 'wednesday', 'friday']
+            name: 'Snack Combo',
+            items: ['tuck_1', 'tuck_3'],
+            originalPrice: 35,
+            discountedPrice: 30,
+            description: 'Samosa + Fresh Juice'
           }
         ],
-        specialOffers: '10% off on fresh items'
+        specialOffers: ['Buy 2 Sandwiches, Get 1 Cookie Free']
       },
-      'tuesday': {
-        items: mockInventory.filter(item => item.storeType === 'tuckShop'),
+      tuesday: {
+        items: ['tuck_2', 'tuck_4', 'tuck_3'],
         combos: [],
-        specialOffers: 'Buy 2 get 1 free on sandwiches'
+        specialOffers: []
+      },
+      wednesday: {
+        items: ['tuck_1', 'tuck_2', 'tuck_3', 'tuck_4'],
+        combos: [
+          {
+            id: 'combo_2',
+            name: 'Full Meal',
+            items: ['tuck_2', 'tuck_3', 'tuck_4'],
+            originalPrice: 55,
+            discountedPrice: 45,
+            description: 'Sandwich + Juice + Cookies'
+          }
+        ],
+        specialOffers: ['20% off on Fresh Juice']
+      },
+      thursday: {
+        items: ['tuck_1', 'tuck_4'],
+        combos: [],
+        specialOffers: []
+      },
+      friday: {
+        items: ['tuck_1', 'tuck_2', 'tuck_3', 'tuck_4'],
+        combos: [
+          {
+            id: 'combo_3',
+            name: 'Weekend Special',
+            items: ['tuck_1', 'tuck_2', 'tuck_3'],
+            originalPrice: 60,
+            discountedPrice: 50,
+            description: 'Samosa + Sandwich + Fresh Juice'
+          }
+        ],
+        specialOffers: ['Free Cookie with any purchase above ₹40']
       }
     },
-    isActive: true,
-    createdBy: 'Ram Kumar',
-    createdAt: new Date('2024-01-14')
+    isActive: true
   }
 ];
 
 export const mockTransactions: Transaction[] = [
   {
-    id: 'txn_001',
+    id: 'txn_1',
     studentId: '1',
-    studentName: 'Arjun Sharma',
-    storeType: 'tuckShop',
-    amount: 70,
+    storeId: 'store_1',
     items: [
-      { id: 'tuck_001', name: 'Fresh Fruit Salad', price: 35, quantity: 1, category: 'Fresh Food' },
-      { id: 'tuck_002', name: 'Grilled Sandwich', price: 45, quantity: 1, category: 'Hot Food' }
+      { id: 'tuck_1', quantity: 2, unitPrice: 15, totalPrice: 30 }
     ],
-    timestamp: new Date('2024-01-15T14:30:00'),
-    balanceAfter: 380,
-    receiptNumber: 'RCP001'
+    totalAmount: 30,
+    timestamp: new Date('2024-01-15T10:30:00'),
+    paymentMethod: 'RFID Wallet',
+    status: 'completed'
   },
   {
-    id: 'txn_002',
+    id: 'txn_2',
     studentId: '2',
-    studentName: 'Priya Gupta',
-    storeType: 'dryFoodShop',
-    amount: 50,
+    storeId: 'store_2',
     items: [
-      { id: 'dry_001', name: 'Potato Chips', price: 20, quantity: 1, category: 'Snacks' },
-      { id: 'dry_002', name: 'Chocolate Bar', price: 30, quantity: 1, category: 'Confectionery' }
+      { itemId: 'dry_1', quantity: 1, unitPrice: 12, totalPrice: 12 },
+      { itemId: 'dry_2', quantity: 1, unitPrice: 15, totalPrice: 15 }
     ],
-    timestamp: new Date('2024-01-15T12:15:00'),
-    balanceAfter: 270,
-    receiptNumber: 'RCP002'
+    totalAmount: 27,
+    timestamp: new Date('2024-01-15T11:45:00'),
+    paymentMethod: 'RFID Wallet',
+    status: 'completed'
   },
   {
-    id: 'txn_003',
+    id: 'txn_3',
     studentId: '3',
-    studentName: 'Rohan Patel',
-    storeType: 'generalStore',
-    amount: 80,
+    storeId: 'store_3',
     items: [
-      { id: 'gen_002', name: 'Toothpaste', price: 45, quantity: 1, category: 'Personal Care' },
-      { id: 'gen_004', name: 'Notebook', price: 50, quantity: 1, category: 'Stationery' }
+      { itemId: 'gen_1', quantity: 3, unitPrice: 30, totalPrice: 90 }
     ],
-    timestamp: new Date('2024-01-15T16:45:00'),
-    balanceAfter: 100,
-    receiptNumber: 'RCP003'
+    totalAmount: 90,
+    timestamp: new Date('2024-01-15T14:20:00'),
+    paymentMethod: 'RFID Wallet',
+    status: 'completed'
   }
 ];
