@@ -9,8 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Users, UserPlus, Upload, Edit, Trash2, CreditCard, AlertTriangle } from 'lucide-react';
+import { Users, UserPlus, Upload, Edit, Trash2, CreditCard, AlertTriangle, History, Clock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Student } from '@/types/rfid-system';
@@ -26,6 +27,9 @@ const StudentManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [scannedCard, setScannedCard] = useState<{id: string, isActive: boolean, previousOwner?: string} | null>(null);
   const [isScanning, setIsScanning] = useState(false);
+  const [deactivationReason, setDeactivationReason] = useState('');
+  const [selectedStudentForHistory, setSelectedStudentForHistory] = useState<Student | null>(null);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const { toast } = useToast();
 
   // Form state for student data
@@ -77,6 +81,15 @@ const StudentManagement = () => {
       walletBalance: formData.walletBalance,
       isActive: true,
       photoUrl: formData.photoUrl,
+      rfidCardHistory: [
+        {
+          id: `hist-${Date.now()}`,
+          cardNumber: formData.rfidCardNumber || `RFID-${Date.now()}`,
+          action: 'issued',
+          timestamp: new Date(),
+          processedBy: 'Current User'
+        }
+      ],
       weeklySpendingLimits: {
         tuckShop: 500,
         dryFoodShop: 300,
@@ -142,18 +155,44 @@ const StudentManagement = () => {
     });
   };
 
-  const handleDeactivateCard = (studentId: string) => {
+  const handleDeactivateCard = (studentId: string, reason: string) => {
+    if (!reason.trim()) {
+      toast({
+        title: 'Error',
+        description: 'Please provide a reason for deactivating the card',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setStudents(prev => prev.map(student => 
       student.id === studentId 
-        ? { ...student, isActive: false, rfidCardNumber: `DEACTIVATED-${student.rfidCardNumber}` }
+        ? { 
+            ...student, 
+            isActive: false, 
+            rfidCardNumber: `DEACTIVATED-${student.rfidCardNumber}`,
+            rfidCardHistory: [
+              ...student.rfidCardHistory,
+              {
+                id: `hist-${Date.now()}`,
+                cardNumber: student.rfidCardNumber,
+                action: 'deactivated',
+                reason: reason,
+                timestamp: new Date(),
+                processedBy: 'Current User'
+              }
+            ]
+          }
         : student
     ));
     
     toast({
       title: 'RFID Card Deactivated',
-      description: 'The RFID card has been deactivated. Please issue a new card.',
+      description: `Card deactivated. Reason: ${reason}`,
       variant: 'destructive'
     });
+    
+    setDeactivationReason('');
   };
 
   const handleIssueNewCard = (student: Student) => {
@@ -190,7 +229,22 @@ const StudentManagement = () => {
 
     setStudents(prev => prev.map(student => 
       student.id === selectedStudentForCard.id 
-        ? { ...student, isActive: true, rfidCardNumber: scannedCard.id }
+        ? { 
+            ...student, 
+            isActive: true, 
+            rfidCardNumber: scannedCard.id,
+            rfidCardHistory: [
+              ...student.rfidCardHistory,
+              {
+                id: `hist-${Date.now()}`,
+                cardNumber: scannedCard.id,
+                action: 'issued',
+                timestamp: new Date(),
+                processedBy: 'Current User',
+                previousOwner: scannedCard.previousOwner
+              }
+            ]
+          }
         : student
     ));
     
@@ -218,6 +272,21 @@ const StudentManagement = () => {
       walletBalance: student.walletBalance
     });
     setIsEditDialogOpen(true);
+  };
+
+  const openHistoryDialog = (student: Student) => {
+    setSelectedStudentForHistory(student);
+    setIsHistoryDialogOpen(true);
+  };
+
+  const getFrequentLossAlert = (student: Student) => {
+    const deactivations = student.rfidCardHistory.filter(h => h.action === 'deactivated').length;
+    if (deactivations >= 3) {
+      return { level: 'high', message: `⚠️ High Risk: ${deactivations} cards lost` };
+    } else if (deactivations >= 2) {
+      return { level: 'medium', message: `⚠️ Moderate Risk: ${deactivations} cards lost` };
+    }
+    return null;
   };
 
   const StudentForm = ({ isEdit = false }: { isEdit?: boolean }) => (
@@ -391,6 +460,7 @@ const StudentManagement = () => {
                     <TableHead>RFID Card</TableHead>
                     <TableHead>Wallet Balance</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Card History</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -416,6 +486,17 @@ const StudentManagement = () => {
                           {student.rfidCardNumber.includes('DEACTIVATED') && (
                             <Badge variant="destructive">Deactivated</Badge>
                           )}
+                          {(() => {
+                            const alert = getFrequentLossAlert(student);
+                            if (alert) {
+                              return (
+                                <Badge variant={alert.level === 'high' ? 'destructive' : 'secondary'} className="text-xs">
+                                  {alert.message}
+                                </Badge>
+                              );
+                            }
+                            return null;
+                          })()}
                         </div>
                       </TableCell>
                       <TableCell>₹{student.walletBalance}</TableCell>
@@ -423,6 +504,20 @@ const StudentManagement = () => {
                         <Badge variant={student.isActive ? "default" : "secondary"}>
                           {student.isActive ? "Active" : "Inactive"}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openHistoryDialog(student)}
+                            >
+                              <History className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>View RFID card history</TooltipContent>
+                        </Tooltip>
                       </TableCell>
                       <TableCell>
                         <TooltipProvider>
@@ -455,12 +550,22 @@ const StudentManagement = () => {
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>Deactivate RFID Card</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to deactivate the RFID card for {student.name}? This action will prevent the student from making transactions until a new card is issued.
+                                    Provide a reason for deactivating the RFID card for {student.name}. This action will prevent the student from making transactions until a new card is issued.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
+                                <div className="py-4">
+                                  <Label htmlFor="deactivation-reason">Reason for deactivation *</Label>
+                                  <Textarea
+                                    id="deactivation-reason"
+                                    placeholder="e.g., Card lost, Card damaged, Student request..."
+                                    value={deactivationReason}
+                                    onChange={(e) => setDeactivationReason(e.target.value)}
+                                    className="mt-2"
+                                  />
+                                </div>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDeactivateCard(student.id)}>
+                                  <AlertDialogCancel onClick={() => setDeactivationReason('')}>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDeactivateCard(student.id, deactivationReason)}>
                                     Deactivate Card
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
@@ -601,6 +706,108 @@ const StudentManagement = () => {
                     </div>
                   )}
                 </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* RFID Card History Dialog */}
+          <Dialog open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle className="flex items-center">
+                  <History className="h-5 w-5 mr-2" />
+                  RFID Card History - {selectedStudentForHistory?.name}
+                </DialogTitle>
+                <DialogDescription>
+                  Complete history of RFID card activities for this student
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                {selectedStudentForHistory?.rfidCardHistory && selectedStudentForHistory.rfidCardHistory.length > 0 ? (
+                  <div className="space-y-3">
+                    {selectedStudentForHistory.rfidCardHistory
+                      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                      .map((record) => (
+                        <div 
+                          key={record.id} 
+                          className={`border rounded-lg p-4 ${
+                            record.action === 'deactivated' 
+                              ? 'border-red-200 bg-red-50' 
+                              : record.action === 'issued' 
+                              ? 'border-green-200 bg-green-50'
+                              : 'border-blue-200 bg-blue-50'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2">
+                                <Badge 
+                                  variant={
+                                    record.action === 'deactivated' 
+                                      ? 'destructive' 
+                                      : record.action === 'issued' 
+                                      ? 'default'
+                                      : 'secondary'
+                                  }
+                                >
+                                  {record.action.toUpperCase()}
+                                </Badge>
+                                <span className="font-mono text-sm">{record.cardNumber}</span>
+                              </div>
+                              
+                              {record.reason && (
+                                <p className="text-sm text-muted-foreground">
+                                  <strong>Reason:</strong> {record.reason}
+                                </p>
+                              )}
+                              
+                              {record.previousOwner && (
+                                <p className="text-sm text-orange-600">
+                                  <strong>Previous Owner:</strong> {record.previousOwner}
+                                </p>
+                              )}
+                              
+                              <p className="text-xs text-muted-foreground">
+                                Processed by: {record.processedBy}
+                              </p>
+                            </div>
+                            
+                            <div className="text-right text-xs text-muted-foreground">
+                              <div className="flex items-center">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {new Date(record.timestamp).toLocaleDateString()}
+                              </div>
+                              <div>{new Date(record.timestamp).toLocaleTimeString()}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    
+                    {(() => {
+                      const deactivations = selectedStudentForHistory.rfidCardHistory.filter(h => h.action === 'deactivated').length;
+                      if (deactivations >= 2) {
+                        return (
+                          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                            <div className="flex items-center space-x-2">
+                              <AlertTriangle className="h-4 w-4 text-orange-600" />
+                              <span className="font-medium text-orange-800">Frequent Card Loss Alert</span>
+                            </div>
+                            <p className="text-sm text-orange-700 mt-1">
+                              This student has lost {deactivations} cards. Consider counseling about card care.
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <History className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">No RFID card history available</p>
+                  </div>
+                )}
               </div>
             </DialogContent>
           </Dialog>

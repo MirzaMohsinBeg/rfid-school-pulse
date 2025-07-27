@@ -1,4 +1,4 @@
-import { Student, Transaction, Store, InventoryItem, SpendingLimit, StoreUser, WeeklyMenu, MenuCombo } from '@/types/rfid-system';
+import { Student, Transaction, Store, InventoryItem, SpendingLimit, StoreUser, WeeklyMenu, MenuCombo, RfidCardHistory } from '@/types/rfid-system';
 
 export const mockSpendingLimits: SpendingLimit[] = [
   { class: 'Class 6', limits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 } },
@@ -19,6 +19,15 @@ export const mockStudents: Student[] = [
     walletBalance: 450,
     isActive: true,
     photoUrl: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [
+      {
+        id: 'hist_1',
+        cardNumber: 'RFID001234',
+        action: 'issued',
+        timestamp: new Date('2024-01-01T10:00:00'),
+        processedBy: 'Admin User'
+      }
+    ],
     weeklySpendingLimits: { tuckShop: 250, dryFoodShop: 250, generalStore: 200 },
     currentWeekSpending: { tuckShop: 120, dryFoodShop: 85, generalStore: 45 },
     lastTransaction: new Date('2024-01-15T14:30:00')
@@ -31,6 +40,15 @@ export const mockStudents: Student[] = [
     walletBalance: 320,
     isActive: true,
     photoUrl: 'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [
+      {
+        id: 'hist_2',
+        cardNumber: 'RFID001235',
+        action: 'issued',
+        timestamp: new Date('2024-01-05T11:00:00'),
+        processedBy: 'Admin User'
+      }
+    ],
     weeklySpendingLimits: { tuckShop: 200, dryFoodShop: 200, generalStore: 150 },
     currentWeekSpending: { tuckShop: 80, dryFoodShop: 60, generalStore: 30 },
     lastTransaction: new Date('2024-01-15T12:15:00')
@@ -43,6 +61,15 @@ export const mockStudents: Student[] = [
     walletBalance: 180,
     isActive: true,
     photoUrl: 'https://images.unsplash.com/photo-1535268647677-300dbf3078d1?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [
+      {
+        id: 'hist_3',
+        cardNumber: 'RFID001236',
+        action: 'issued',
+        timestamp: new Date('2024-01-10T09:30:00'),
+        processedBy: 'Admin User'
+      }
+    ],
     weeklySpendingLimits: { tuckShop: 300, dryFoodShop: 300, generalStore: 250 },
     currentWeekSpending: { tuckShop: 220, dryFoodShop: 180, generalStore: 120 },
     lastTransaction: new Date('2024-01-15T16:45:00')
@@ -51,10 +78,42 @@ export const mockStudents: Student[] = [
     id: '4',
     name: 'Sneha Reddy',
     class: 'Class 6',
-    rfidCardNumber: 'RFID001237',
+    rfidCardNumber: 'DEACTIVATED-RFID001237',
     walletBalance: 250,
     isActive: false,
     photoUrl: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [
+      {
+        id: 'hist_4a',
+        cardNumber: 'RFID001237',
+        action: 'issued',
+        timestamp: new Date('2023-12-15T10:00:00'),
+        processedBy: 'Admin User'
+      },
+      {
+        id: 'hist_4b',
+        cardNumber: 'RFID001238',
+        action: 'issued',
+        timestamp: new Date('2024-01-05T14:00:00'),
+        processedBy: 'Admin User'
+      },
+      {
+        id: 'hist_4c',
+        cardNumber: 'RFID001238',
+        action: 'deactivated',
+        reason: 'Card lost by student',
+        timestamp: new Date('2024-01-12T16:30:00'),
+        processedBy: 'Admin User'
+      },
+      {
+        id: 'hist_4d',
+        cardNumber: 'RFID001237',
+        action: 'deactivated',
+        reason: 'Card damaged',
+        timestamp: new Date('2024-01-14T10:20:00'),
+        processedBy: 'Admin User'
+      }
+    ],
     weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
     currentWeekSpending: { tuckShop: 50, dryFoodShop: 40, generalStore: 20 },
     lastTransaction: new Date('2024-01-14T10:20:00')

@@ -1,3 +1,13 @@
+export interface RfidCardHistory {
+  id: string;
+  cardNumber: string;
+  action: 'issued' | 'deactivated' | 'transferred';
+  reason?: string;
+  timestamp: Date;
+  processedBy: string;
+  previousOwner?: string;
+}
+
 export interface Student {
   id: string;
   name: string;
@@ -6,6 +16,7 @@ export interface Student {
   walletBalance: number;
   isActive: boolean;
   photoUrl?: string;
+  rfidCardHistory: RfidCardHistory[];
   weeklySpendingLimits: {
     tuckShop: number;
     dryFoodShop: number;
