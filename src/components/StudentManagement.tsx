@@ -16,7 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Student } from '@/types/rfid-system';
 import { mockStudents } from '@/data/mockData';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
 const StudentManagement = () => {
   const [students, setStudents] = useState<Student[]>(mockStudents);
@@ -79,7 +79,12 @@ const StudentManagement = () => {
     return Object.entries(classCount).map(([className, count]) => ({
       class: className,
       students: count
-    })).sort((a, b) => a.class.localeCompare(b.class));
+    })).sort((a, b) => {
+      // Extract class numbers for proper ascending sort
+      const aNum = parseInt(a.class.replace('Class ', ''));
+      const bNum = parseInt(b.class.replace('Class ', ''));
+      return aNum - bNum;
+    });
   }, [filteredStudents]);
 
   const resetForm = () => {
@@ -536,13 +541,13 @@ const StudentManagement = () => {
             </div>
             <div className="w-80 h-40">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={classWiseData}>
+                <BarChart data={classWiseData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="class" fontSize={10} />
                   <YAxis fontSize={10} />
                   <RechartsTooltip />
-                  <Line type="monotone" dataKey="students" stroke="hsl(var(--primary))" strokeWidth={2} />
-                </LineChart>
+                  <Bar dataKey="students" fill="hsl(var(--primary))" />
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
