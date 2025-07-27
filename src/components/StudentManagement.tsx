@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Student } from '@/types/rfid-system';
 import { mockStudents } from '@/data/mockData';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
 const StudentManagement = () => {
   const [students, setStudents] = useState<Student[]>(mockStudents);
@@ -27,9 +28,8 @@ const StudentManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [classFilter, setClassFilter] = useState('');
   const [sectionFilter, setSectionFilter] = useState('');
-  const [sessionFilter, setSessionFilter] = useState('');
   const [isPromotionDialogOpen, setIsPromotionDialogOpen] = useState(false);
-  const [selectedSession, setSelectedSession] = useState('2024-25');
+  const currentSession = '2024-25';
   const [promotionData, setPromotionData] = useState({
     fromSession: '2024-25',
     toSession: '2025-26',
@@ -56,17 +56,31 @@ const StudentManagement = () => {
   });
 
   const filteredStudents = students.filter(student => {
+    // Only show students from current session
+    if (student.session !== currentSession) return false;
+    
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.rfidCardNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.admissionNumber.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesClass = !classFilter || student.class === classFilter;
-    const matchesSection = !sectionFilter || student.section === sectionFilter;
-    const matchesSession = !sessionFilter || student.session === sessionFilter;
+    const matchesClass = !classFilter || classFilter === 'all' || student.class === classFilter;
+    const matchesSection = !sectionFilter || sectionFilter === 'all' || student.section === sectionFilter;
     
-    return matchesSearch && matchesClass && matchesSection && matchesSession;
+    return matchesSearch && matchesClass && matchesSection;
   });
+
+  const classWiseData = useMemo(() => {
+    const classCount = {};
+    filteredStudents.forEach(student => {
+      const className = `Class ${student.class}`;
+      classCount[className] = (classCount[className] || 0) + 1;
+    });
+    return Object.entries(classCount).map(([className, count]) => ({
+      class: className,
+      students: count
+    })).sort((a, b) => a.class.localeCompare(b.class));
+  }, [filteredStudents]);
 
   const resetForm = () => {
     setFormData({
@@ -511,10 +525,29 @@ const StudentManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Student Management</h2>
-        <p className="text-muted-foreground">Manage student profiles and RFID card assignments</p>
-      </div>
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>Student Management</CardTitle>
+              <CardDescription>
+                Manage student information and RFID cards - Active Session: {currentSession}
+              </CardDescription>
+            </div>
+            <div className="w-80 h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={classWiseData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="class" fontSize={10} />
+                  <YAxis fontSize={10} />
+                  <RechartsTooltip />
+                  <Line type="monotone" dataKey="students" stroke="hsl(var(--primary))" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
 
       <Tabs defaultValue="students" className="space-y-4">
         <TabsList>
@@ -588,17 +621,6 @@ const StudentManagement = () => {
                       <SelectItem value="all">All Sections</SelectItem>
                       {getUniqueSections().map(section => (
                         <SelectItem key={section} value={section}>Section {section}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={sessionFilter} onValueChange={setSessionFilter}>
-                    <SelectTrigger className="w-[150px]">
-                      <SelectValue placeholder="All Sessions" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Sessions</SelectItem>
-                      {getUniqueSessions().map(session => (
-                        <SelectItem key={session} value={session}>{session}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -703,7 +725,6 @@ const StudentManagement = () => {
                   <TableRow>
                     <TableHead>Student</TableHead>
                     <TableHead>Class/Section</TableHead>
-                    <TableHead>Session</TableHead>
                     <TableHead>RFID Card</TableHead>
                     <TableHead>Wallet Balance</TableHead>
                     <TableHead>Status</TableHead>
@@ -733,9 +754,6 @@ const StudentManagement = () => {
                           <div className="font-medium">Class {student.class}</div>
                           <div className="text-sm text-muted-foreground">Section {student.section}</div>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{student.session}</Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
