@@ -35,7 +35,11 @@ const StudentManagement = () => {
   const [promotionData, setPromotionData] = useState({
     fromSession: '2024-25',
     toSession: '2025-26',
-    classPromotions: [] as Array<{class: string, promoteToClass: string}>
+    classPromotions: [] as Array<{
+      class: string, 
+      promoteToClass: string,
+      selectedStudents: string[] // Array of student IDs
+    }>
   });
 
   const [sessions, setSessions] = useState([
@@ -43,6 +47,11 @@ const StudentManagement = () => {
   ]);
   const [newSession, setNewSession] = useState('');
   const [isAddSessionDialogOpen, setIsAddSessionDialogOpen] = useState(false);
+
+  // Get available classes in order
+  const getClassOrder = () => {
+    return ['LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+  };
   const [scannedCard, setScannedCard] = useState<{id: string, isActive: boolean, previousOwner?: string} | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [deactivationReason, setDeactivationReason] = useState('');
@@ -510,11 +519,24 @@ const StudentManagement = () => {
       return;
     }
 
+    // Check if any students are selected for promotion
+    const hasSelectedStudents = promotionData.classPromotions.some(p => p.selectedStudents.length > 0);
+    if (!hasSelectedStudents) {
+      toast({
+        title: 'Error',
+        description: 'Please select at least one student for promotion',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     const promotedStudents: Array<{studentId: string, studentName: string, fromClass: string, toClass: string}> = [];
     
     const updatedStudents = students.map(student => {
       if (student.session === promotionData.fromSession) {
-        const promotion = promotionData.classPromotions.find(p => p.class === student.class);
+        const promotion = promotionData.classPromotions.find(p => 
+          p.class === student.class && p.selectedStudents.includes(student.id)
+        );
         if (promotion) {
           promotedStudents.push({
             studentId: student.id,
@@ -550,7 +572,11 @@ const StudentManagement = () => {
   const addClassPromotion = () => {
     setPromotionData(prev => ({
       ...prev,
-      classPromotions: [...prev.classPromotions, { class: '', promoteToClass: '' }]
+      classPromotions: [...prev.classPromotions, { 
+        class: '', 
+        promoteToClass: '', 
+        selectedStudents: [] 
+      }]
     }));
   };
 
@@ -566,13 +592,60 @@ const StudentManagement = () => {
     }
   };
 
-  const updateClassPromotion = (index: number, field: 'class' | 'promoteToClass', value: string) => {
+  const updateClassPromotion = (index: number, field: string, value: string) => {
     setPromotionData(prev => ({
       ...prev,
-      classPromotions: prev.classPromotions.map((item, i) => 
-        i === index ? { ...item, [field]: value } : item
+      classPromotions: prev.classPromotions.map((promotion, i) => 
+        i === index ? { 
+          ...promotion, 
+          [field]: value,
+          // Reset selected students when class changes
+          selectedStudents: field === 'class' ? [] : promotion.selectedStudents
+        } : promotion
       )
     }));
+  };
+
+  const toggleStudentSelection = (promotionIndex: number, studentId: string) => {
+    setPromotionData(prev => ({
+      ...prev,
+      classPromotions: prev.classPromotions.map((promotion, i) => {
+        if (i === promotionIndex) {
+          const isSelected = promotion.selectedStudents.includes(studentId);
+          return {
+            ...promotion,
+            selectedStudents: isSelected 
+              ? promotion.selectedStudents.filter(id => id !== studentId)
+              : [...promotion.selectedStudents, studentId]
+          };
+        }
+        return promotion;
+      })
+    }));
+  };
+
+  const selectAllStudentsForClass = (promotionIndex: number, selectAll: boolean) => {
+    const promotion = promotionData.classPromotions[promotionIndex];
+    const studentsInClass = students.filter(s => 
+      s.session === promotionData.fromSession && s.class === promotion.class
+    );
+    
+    setPromotionData(prev => ({
+      ...prev,
+      classPromotions: prev.classPromotions.map((p, i) => 
+        i === promotionIndex ? {
+          ...p,
+          selectedStudents: selectAll ? studentsInClass.map(s => s.id) : []
+        } : p
+      )
+    }));
+  };
+
+  // Get higher classes for validation
+  const getHigherClasses = (currentClass: string) => {
+    const classOrder = getClassOrder();
+    const currentIndex = classOrder.indexOf(currentClass);
+    return currentIndex >= 0 ? classOrder.slice(currentIndex + 1) : [];
   };
 
   const removeClassPromotion = (index: number) => {
@@ -994,40 +1067,87 @@ const StudentManagement = () => {
                             <Label>Class Promotion Rules</Label>
                             <Button size="sm" onClick={addClassPromotion}>Add Rule</Button>
                           </div>
-                          {promotionData.classPromotions.map((promotion, index) => (
-                            <div key={index} className="flex gap-2 items-center mb-2">
-                              <Select value={promotion.class} onValueChange={(value) => 
-                                updateClassPromotion(index, 'class', value)}>
-                                <SelectTrigger className="flex-1">
-                                  <SelectValue placeholder="From Class" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {getUniqueClasses().map(cls => (
-                                    <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <span>→</span>
-                              <Select value={promotion.promoteToClass} onValueChange={(value) => 
-                                updateClassPromotion(index, 'promoteToClass', value)}>
-                                <SelectTrigger className="flex-1">
-                                  <SelectValue placeholder="To Class" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="7">Class 7</SelectItem>
-                                  <SelectItem value="8">Class 8</SelectItem>
-                                  <SelectItem value="9">Class 9</SelectItem>
-                                  <SelectItem value="10">Class 10</SelectItem>
-                                  <SelectItem value="11">Class 11</SelectItem>
-                                  <SelectItem value="12">Class 12</SelectItem>
-                                  <SelectItem value="GRADUATED">Graduated</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <Button size="sm" variant="destructive" onClick={() => removeClassPromotion(index)}>
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
+                          {promotionData.classPromotions.map((promotion, index) => {
+                            const studentsInClass = students.filter(s => 
+                              s.session === promotionData.fromSession && s.class === promotion.class
+                            );
+                            const higherClasses = getHigherClasses(promotion.class);
+                            
+                            return (
+                              <div key={index} className="border rounded-lg p-4 space-y-3 mb-4">
+                                <div className="flex gap-2 items-center">
+                                  <Select value={promotion.class} onValueChange={(value) => 
+                                    updateClassPromotion(index, 'class', value)}>
+                                    <SelectTrigger className="flex-1">
+                                      <SelectValue placeholder="From Class" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getUniqueClasses().map(cls => (
+                                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <span>→</span>
+                                  <Select value={promotion.promoteToClass} onValueChange={(value) => 
+                                    updateClassPromotion(index, 'promoteToClass', value)}>
+                                    <SelectTrigger className="flex-1">
+                                      <SelectValue placeholder="To Class" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {higherClasses.map(cls => (
+                                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                                      ))}
+                                      <SelectItem value="GRADUATED">Graduated</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button size="sm" variant="destructive" onClick={() => removeClassPromotion(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+
+                                {promotion.class && studentsInClass.length > 0 && (
+                                  <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <Label className="text-sm">Select Students to Promote ({promotion.selectedStudents.length}/{studentsInClass.length})</Label>
+                                      <div className="space-x-2">
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={() => selectAllStudentsForClass(index, true)}
+                                        >
+                                          Select All
+                                        </Button>
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={() => selectAllStudentsForClass(index, false)}
+                                        >
+                                          Clear All
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    <div className="max-h-32 overflow-y-auto border rounded p-2 space-y-1">
+                                      {studentsInClass.map(student => (
+                                        <div key={student.id} className="flex items-center space-x-2">
+                                          <input
+                                            type="checkbox"
+                                            checked={promotion.selectedStudents.includes(student.id)}
+                                            onChange={() => toggleStudentSelection(index, student.id)}
+                                            className="rounded"
+                                          />
+                                          <span className="text-sm">{student.name} (ID: {student.id})</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {promotion.class && studentsInClass.length === 0 && (
+                                  <p className="text-sm text-muted-foreground">No students found in Class {promotion.class} for session {promotionData.fromSession}</p>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                       <div className="flex justify-end space-x-2">
