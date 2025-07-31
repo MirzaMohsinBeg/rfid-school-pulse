@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Users, UserPlus, Upload, Edit, Trash2, CreditCard, AlertTriangle, History, Clock } from 'lucide-react';
+import { Users, UserPlus, Upload, Edit, Trash2, CreditCard, AlertTriangle, History, Clock, Plus } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Student, StudentRefund, LeftStudent } from '@/types/rfid-system';
@@ -37,6 +37,12 @@ const StudentManagement = () => {
     toSession: '2025-26',
     classPromotions: [] as Array<{class: string, promoteToClass: string}>
   });
+
+  const [sessions, setSessions] = useState([
+    '2023-24', '2024-25', '2025-26'
+  ]);
+  const [newSession, setNewSession] = useState('');
+  const [isAddSessionDialogOpen, setIsAddSessionDialogOpen] = useState(false);
   const [scannedCard, setScannedCard] = useState<{id: string, isActive: boolean, previousOwner?: string} | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [deactivationReason, setDeactivationReason] = useState('');
@@ -548,6 +554,18 @@ const StudentManagement = () => {
     }));
   };
 
+  const addNewSession = () => {
+    if (newSession && !sessions.includes(newSession)) {
+      setSessions(prev => [...prev, newSession]);
+      setNewSession('');
+      setIsAddSessionDialogOpen(false);
+      toast({
+        title: 'Session Added',
+        description: `Session ${newSession} has been added successfully`,
+      });
+    }
+  };
+
   const updateClassPromotion = (index: number, field: 'class' | 'promoteToClass', value: string) => {
     setPromotionData(prev => ({
       ...prev,
@@ -937,21 +955,35 @@ const StudentManagement = () => {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="2023-24">2023-24</SelectItem>
-                                <SelectItem value="2024-25">2024-25</SelectItem>
+                                {sessions.map(session => (
+                                  <SelectItem key={session} value={session}>{session}</SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>
                           <div>
-                            <Label>To Session</Label>
+                            <Label className="flex items-center justify-between">
+                              To Session
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsAddSessionDialogOpen(true)}
+                                className="h-6 px-2 text-xs"
+                              >
+                                <Plus className="h-3 w-3 mr-1" />
+                                Add Session
+                              </Button>
+                            </Label>
                             <Select value={promotionData.toSession} onValueChange={(value) => 
                               setPromotionData(prev => ({ ...prev, toSession: value }))}>
                               <SelectTrigger>
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="2024-25">2024-25</SelectItem>
-                                <SelectItem value="2025-26">2025-26</SelectItem>
+                                {sessions.map(session => (
+                                  <SelectItem key={session} value={session}>{session}</SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>
@@ -1003,6 +1035,35 @@ const StudentManagement = () => {
                           Cancel
                         </Button>
                         <Button onClick={handlePromoteStudents}>Promote Students</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={isAddSessionDialogOpen} onOpenChange={setIsAddSessionDialogOpen}>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Session</DialogTitle>
+                        <DialogDescription>
+                          Create a new academic session for student promotion
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Session Name</Label>
+                          <Input
+                            placeholder="e.g., 2026-27"
+                            value={newSession}
+                            onChange={(e) => setNewSession(e.target.value)}
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" onClick={() => setIsAddSessionDialogOpen(false)}>
+                            Cancel
+                          </Button>
+                          <Button onClick={addNewSession} disabled={!newSession}>
+                            Add Session
+                          </Button>
+                        </div>
                       </div>
                     </DialogContent>
                   </Dialog>
