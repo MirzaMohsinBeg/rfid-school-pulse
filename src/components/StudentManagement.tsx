@@ -195,7 +195,7 @@ const StudentManagement = () => {
 
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [studentToProcess, setStudentToProcess] = useState<typeof students[0] | null>(null);
-  const [refundAmount, setRefundAmount] = useState(0);
+  // Removed refundAmount state as we'll do full refund only
   const [refundMethod, setRefundMethod] = useState<'cash' | 'bank_transfer' | 'cheque'>('cash');
   const [refundReference, setRefundReference] = useState('');
   const [isReportsDialogOpen, setIsReportsDialogOpen] = useState(false);
@@ -208,7 +208,6 @@ const StudentManagement = () => {
     // Check if student has wallet balance
     if (student.walletBalance > 0) {
       setStudentToProcess(student);
-      setRefundAmount(student.walletBalance);
       setRefundDialogOpen(true);
       return;
     }
@@ -254,6 +253,8 @@ const StudentManagement = () => {
   const handleProcessRefund = () => {
     if (!studentToProcess) return;
 
+    const fullRefundAmount = studentToProcess.walletBalance;
+
     // Create refund record
     const refundRecord: StudentRefund = {
       id: `refund-${Date.now()}`,
@@ -261,7 +262,7 @@ const StudentManagement = () => {
       studentName: studentToProcess.name,
       admissionNumber: studentToProcess.admissionNumber,
       originalBalance: studentToProcess.walletBalance,
-      refundAmount: refundAmount,
+      refundAmount: fullRefundAmount,
       refundMethod: refundMethod,
       referenceNumber: refundReference,
       processedBy: 'admin', // Would come from auth context
@@ -280,7 +281,7 @@ const StudentManagement = () => {
       fatherName: studentToProcess.fatherName,
       walletBalanceAtLeaving: studentToProcess.walletBalance,
       refundProcessed: true,
-      refundAmount: refundAmount,
+      refundAmount: fullRefundAmount,
       leftDate: new Date(),
       processedBy: 'admin'
     };
@@ -289,11 +290,10 @@ const StudentManagement = () => {
     setRefunds(prev => [...prev, refundRecord]);
     setLeftStudents(prev => [...prev, leftStudentRecord]);
 
-    // Update student's balance to remaining amount
-    const remainingBalance = studentToProcess.walletBalance - refundAmount;
+    // Update student's balance to zero (full refund)
     setStudents(prev => prev.map(s => 
       s.id === studentToProcess.id 
-        ? { ...s, walletBalance: remainingBalance }
+        ? { ...s, walletBalance: 0 }
         : s
     ));
 
@@ -303,15 +303,61 @@ const StudentManagement = () => {
     }, 500);
 
     toast({
-      title: 'Refund Processed',
-      description: `₹${refundAmount} refund processed for ${studentToProcess.name} via ${refundMethod}. Remaining balance: ₹${remainingBalance}`,
+      title: 'Full Refund Processed',
+      description: `₹${fullRefundAmount} full refund processed for ${studentToProcess.name} via ${refundMethod}`,
     });
 
     // Reset refund dialog
     setRefundDialogOpen(false);
     setStudentToProcess(null);
-    setRefundAmount(0);
     setRefundReference('');
+  };
+
+  const handleReactivateStudent = (leftStudent: LeftStudent) => {
+    // Create a new student record from left student data
+    const reactivatedStudent: Student = {
+      id: leftStudent.id,
+      name: leftStudent.name,
+      class: leftStudent.class,
+      section: leftStudent.section,
+      session: leftStudent.session,
+      admissionNumber: leftStudent.admissionNumber,
+      fatherName: leftStudent.fatherName,
+      rfidCardNumber: `RFID-${Date.now()}`, // Generate new RFID card
+      walletBalance: 0,
+      isActive: true,
+      photoUrl: '',
+      rfidCardHistory: [
+        {
+          id: `hist-${Date.now()}`,
+          cardNumber: `RFID-${Date.now()}`,
+          action: 'issued',
+          timestamp: new Date(),
+          processedBy: 'admin'
+        }
+      ],
+      weeklySpendingLimits: {
+        tuckShop: 500,
+        dryFoodShop: 300,
+        generalStore: 200
+      },
+      currentWeekSpending: {
+        tuckShop: 0,
+        dryFoodShop: 0,
+        generalStore: 0
+      }
+    };
+
+    // Add back to students list
+    setStudents(prev => [...prev, reactivatedStudent]);
+    
+    // Remove from left students
+    setLeftStudents(prev => prev.filter(ls => ls.id !== leftStudent.id));
+
+    toast({
+      title: 'Student Reactivated',
+      description: `${leftStudent.name} has been reactivated and can now use the system again`,
+    });
   };
 
   const handleDeactivateCard = (studentId: string, reason: string) => {
@@ -827,27 +873,37 @@ const StudentManagement = () => {
                                     <TableHead>Balance at Leaving</TableHead>
                                     <TableHead>Refund Status</TableHead>
                                     <TableHead>Refund Amount</TableHead>
-                                    <TableHead>Left Date</TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {leftStudents.map((student) => (
-                                    <TableRow key={student.id}>
-                                      <TableCell className="font-medium">{student.name}</TableCell>
-                                      <TableCell>{student.admissionNumber}</TableCell>
-                                      <TableCell>Class {student.class}-{student.section}</TableCell>
-                                      <TableCell>₹{student.walletBalanceAtLeaving}</TableCell>
-                                      <TableCell>
-                                        <Badge variant={student.refundProcessed ? "default" : "destructive"}>
-                                          {student.refundProcessed ? 'Processed' : 'Pending'}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell>
-                                        {student.refundAmount ? `₹${student.refundAmount}` : '-'}
-                                      </TableCell>
-                                      <TableCell>{student.leftDate.toLocaleDateString()}</TableCell>
-                                    </TableRow>
-                                  ))}
+                                     <TableHead>Left Date</TableHead>
+                                     <TableHead>Actions</TableHead>
+                                   </TableRow>
+                                 </TableHeader>
+                                 <TableBody>
+                                   {leftStudents.map((student) => (
+                                     <TableRow key={student.id}>
+                                       <TableCell className="font-medium">{student.name}</TableCell>
+                                       <TableCell>{student.admissionNumber}</TableCell>
+                                       <TableCell>Class {student.class}-{student.section}</TableCell>
+                                       <TableCell>₹{student.walletBalanceAtLeaving}</TableCell>
+                                       <TableCell>
+                                         <Badge variant={student.refundProcessed ? "default" : "destructive"}>
+                                           {student.refundProcessed ? 'Processed' : 'Pending'}
+                                         </Badge>
+                                       </TableCell>
+                                       <TableCell>
+                                         {student.refundAmount ? `₹${student.refundAmount}` : '-'}
+                                       </TableCell>
+                                       <TableCell>{student.leftDate.toLocaleDateString()}</TableCell>
+                                       <TableCell>
+                                         <Button 
+                                           size="sm" 
+                                           variant="outline"
+                                           onClick={() => handleReactivateStudent(student)}
+                                         >
+                                           Reactivate
+                                         </Button>
+                                       </TableCell>
+                                     </TableRow>
+                                   ))}
                                 </TableBody>
                               </Table>
                             </div>
@@ -1421,31 +1477,24 @@ const StudentManagement = () => {
                   <span>Current Balance:</span>
                   <span className="font-semibold">₹{studentToProcess?.walletBalance}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Refund Amount:</span>
-                  <span className="font-semibold text-green-600">₹{refundAmount}</span>
+                                <div className="flex justify-between">
+                  <span>Full Refund Amount:</span>
+                  <span className="font-semibold text-green-600">₹{studentToProcess?.walletBalance}</span>
                 </div>
                 <div className="flex justify-between border-t pt-1">
-                  <span>Remaining Balance:</span>
-                  <span className="font-semibold text-orange-600">
-                    ₹{(studentToProcess?.walletBalance || 0) - refundAmount}
-                  </span>
+                  <span>Final Balance:</span>
+                  <span className="font-semibold text-green-600">₹0</span>
                 </div>
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="refund-amount">Refund Amount</Label>
-              <Input
-                id="refund-amount"
-                type="number"
-                value={refundAmount}
-                onChange={(e) => setRefundAmount(Number(e.target.value))}
-                max={studentToProcess?.walletBalance || 0}
-                placeholder="Enter amount to refund"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Maximum refund: ₹{studentToProcess?.walletBalance}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="flex items-center space-x-2">
+                <AlertTriangle className="h-4 w-4 text-amber-600" />
+                <span className="font-medium text-amber-800">Full Refund Only</span>
+              </div>
+              <p className="text-sm text-amber-700 mt-1">
+                The complete wallet balance of ₹{studentToProcess?.walletBalance} will be refunded. Partial refunds are not allowed.
               </p>
             </div>
 
@@ -1489,9 +1538,9 @@ const StudentManagement = () => {
             </Button>
             <Button 
               onClick={handleProcessRefund}
-              disabled={refundAmount <= 0 || (refundMethod !== 'cash' && !refundReference)}
+              disabled={refundMethod !== 'cash' && !refundReference}
             >
-              Process Refund & Remove Student
+              Process Full Refund & Remove Student
             </Button>
           </div>
         </DialogContent>
