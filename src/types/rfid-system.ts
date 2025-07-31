@@ -134,6 +134,35 @@ export interface WalletRecharge {
   referenceNumber?: string;
 }
 
+export interface StudentRefund {
+  id: string;
+  studentId: string;
+  studentName: string;
+  admissionNumber: string;
+  originalBalance: number;
+  refundAmount: number;
+  refundMethod: 'cash' | 'bank_transfer' | 'cheque';
+  referenceNumber?: string;
+  processedBy: string;
+  processedAt: Date;
+  reason: string;
+}
+
+export interface LeftStudent {
+  id: string;
+  name: string;
+  admissionNumber: string;
+  class: string;
+  section: string;
+  session: string;
+  fatherName?: string;
+  walletBalanceAtLeaving: number;
+  refundProcessed: boolean;
+  refundAmount?: number;
+  leftDate: Date;
+  processedBy: string;
+}
+
 export interface MenuCombo {
   id: string;
   name: string;
