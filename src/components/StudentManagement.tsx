@@ -1470,20 +1470,20 @@ const StudentManagement = () => {
           </DialogHeader>
           
           <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
-              <h4 className="font-semibold text-blue-900">Wallet Balance Details</h4>
+            <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+              <h4 className="font-semibold text-card-foreground">Wallet Balance Details</h4>
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
-                  <span>Current Balance:</span>
-                  <span className="font-semibold">₹{studentToProcess?.walletBalance}</span>
+                  <span className="text-muted-foreground">Current Balance:</span>
+                  <span className="font-semibold text-foreground">₹{studentToProcess?.walletBalance}</span>
                 </div>
                                 <div className="flex justify-between">
-                  <span>Full Refund Amount:</span>
-                  <span className="font-semibold text-green-600">₹{studentToProcess?.walletBalance}</span>
+                  <span className="text-muted-foreground">Full Refund Amount:</span>
+                  <span className="font-semibold text-success">₹{studentToProcess?.walletBalance}</span>
                 </div>
-                <div className="flex justify-between border-t pt-1">
-                  <span>Final Balance:</span>
-                  <span className="font-semibold text-green-600">₹0</span>
+                <div className="flex justify-between border-t border-border pt-1">
+                  <span className="text-muted-foreground">Final Balance:</span>
+                  <span className="font-semibold text-success">₹0</span>
                 </div>
               </div>
             </div>
