@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +12,9 @@ import {
   Settings,
   Wallet,
   Store,
-  ChefHat
+  ChefHat,
+  LogOut,
+  User
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -20,6 +23,8 @@ interface NavigationProps {
 }
 
 const Navigation = ({ activeModule, onModuleChange }: NavigationProps) => {
+  const { user, logout } = useAuth();
+  
   const modules = [
     { id: 'dashboard', name: 'Dashboard', icon: BarChart3, description: 'System Overview' },
     { id: 'wallet', name: 'Boys Bank', icon: Wallet, description: 'Wallet Management' },
@@ -69,7 +74,16 @@ const Navigation = ({ activeModule, onModuleChange }: NavigationProps) => {
         })}
       </nav>
       
-      <div className="pt-4 border-t border-border">
+      <div className="pt-4 border-t border-border space-y-2">
+        {/* User Info */}
+        <div className="flex items-center space-x-2 p-2 bg-muted/50 rounded-md">
+          <User className="h-4 w-4 text-muted-foreground" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">{user?.name}</p>
+            <p className="text-xs text-muted-foreground truncate">{user?.role}</p>
+          </div>
+        </div>
+        
         <Button 
           variant={activeModule === 'settings' ? 'default' : 'ghost'} 
           className={`w-full justify-start ${
@@ -80,6 +94,16 @@ const Navigation = ({ activeModule, onModuleChange }: NavigationProps) => {
         >
           <Settings className="h-4 w-4 mr-2" />
           Settings
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          className="w-full justify-start text-muted-foreground hover:text-foreground" 
+          size="sm"
+          onClick={logout}
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Logout
         </Button>
       </div>
     </div>
