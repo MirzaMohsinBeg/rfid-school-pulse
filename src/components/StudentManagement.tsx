@@ -874,19 +874,19 @@ const StudentManagement = () => {
                                     </Button>
                                   </AlertDialogTrigger>
                                 </TooltipTrigger>
-                                <TooltipContent>Delete student</TooltipContent>
+                                <TooltipContent>Left student</TooltipContent>
                               </Tooltip>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Student</AlertDialogTitle>
+                                  <AlertDialogTitle>Left Student</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete {student.name} from the system? This action cannot be undone and will remove all associated data.
+                                    Are you sure you want to mark {student.name} as left the school? This action cannot be undone and will remove all associated data.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                                   <AlertDialogAction onClick={() => handleDeleteStudent(student.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                    Delete Student
+                                    Left Student
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
