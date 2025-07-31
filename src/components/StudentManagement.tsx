@@ -191,14 +191,93 @@ const StudentManagement = () => {
     });
   };
 
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
+  const [studentToProcess, setStudentToProcess] = useState<typeof students[0] | null>(null);
+  const [refundAmount, setRefundAmount] = useState(0);
+  const [refundMethod, setRefundMethod] = useState<'cash' | 'bank_transfer' | 'cheque'>('cash');
+  const [refundReference, setRefundReference] = useState('');
+
   const handleDeleteStudent = (studentId: string) => {
+    const student = students.find(s => s.id === studentId);
+    if (!student) return;
+
+    // Check if student has wallet balance
+    if (student.walletBalance > 0) {
+      setStudentToProcess(student);
+      setRefundAmount(student.walletBalance);
+      setRefundDialogOpen(true);
+      return;
+    }
+
+    // If no balance, proceed with removal
+    processStudentRemoval(student.id);
+  };
+
+  const processStudentRemoval = (studentId: string) => {
     const student = students.find(s => s.id === studentId);
     setStudents(prev => prev.filter(student => student.id !== studentId));
     
     toast({
       title: 'Student Removed',
-      description: `${student?.name} has been removed from the system`,
+      description: `${student?.name} has been marked as left and removed from the system`,
     });
+  };
+
+  const handleProcessRefund = () => {
+    if (!studentToProcess) return;
+
+    // Add refund transaction to student ledger (this would integrate with your transaction system)
+    const refundTransaction = {
+      id: `refund-${Date.now()}`,
+      studentId: studentToProcess.id,
+      studentName: studentToProcess.name,
+      storeType: 'generalStore' as const,
+      amount: -refundAmount, // Negative amount for refund
+      items: [{
+        id: 'refund-item',
+        name: 'Wallet Balance Refund',
+        price: refundAmount,
+        quantity: 1,
+        category: 'Refund'
+      }],
+      timestamp: new Date(),
+      balanceAfter: 0,
+      receiptNumber: `REF-${Date.now()}`,
+      refundDetails: {
+        method: refundMethod,
+        referenceNumber: refundReference,
+        processedBy: 'admin', // Would come from auth context
+        reason: 'Student left school'
+      }
+    };
+
+    // Here you would typically:
+    // 1. Save the refund transaction to your database
+    // 2. Update the student's wallet balance to 0
+    // 3. Log this in the student ledger
+    
+    // For now, we'll just update the student's balance and remove them
+    setStudents(prev => prev.map(s => 
+      s.id === studentToProcess.id 
+        ? { ...s, walletBalance: 0 }
+        : s
+    ));
+
+    // Remove the student after processing refund
+    setTimeout(() => {
+      processStudentRemoval(studentToProcess.id);
+    }, 500);
+
+    toast({
+      title: 'Refund Processed',
+      description: `₹${refundAmount} refund processed for ${studentToProcess.name} via ${refundMethod}`,
+    });
+
+    // Reset refund dialog
+    setRefundDialogOpen(false);
+    setStudentToProcess(null);
+    setRefundAmount(0);
+    setRefundReference('');
   };
 
   const handleDeactivateCard = (studentId: string, reason: string) => {
@@ -880,7 +959,14 @@ const StudentManagement = () => {
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>Left Student</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to mark {student.name} as left the school? This action cannot be undone and will remove all associated data.
+                                    Are you sure you want to mark {student.name} as left the school? 
+                                    {student.walletBalance > 0 && (
+                                      <span className="block mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-yellow-800">
+                                        <strong>Note:</strong> This student has a wallet balance of ₹{student.walletBalance}. 
+                                        You will be prompted to process a refund.
+                                      </span>
+                                    )}
+                                    This action cannot be undone and will remove all associated data.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -1164,6 +1250,77 @@ const StudentManagement = () => {
               Cancel
             </Button>
             <Button onClick={handleEditStudent}>Update Student</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Refund Processing Dialog */}
+      <Dialog open={refundDialogOpen} onOpenChange={setRefundDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Process Wallet Refund</DialogTitle>
+            <DialogDescription>
+              {studentToProcess?.name} has a wallet balance of ₹{studentToProcess?.walletBalance}. 
+              Please process the refund before marking the student as left.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="refund-amount">Refund Amount</Label>
+              <Input
+                id="refund-amount"
+                type="number"
+                value={refundAmount}
+                onChange={(e) => setRefundAmount(Number(e.target.value))}
+                max={studentToProcess?.walletBalance || 0}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="refund-method">Refund Method</Label>
+              <Select value={refundMethod} onValueChange={(value: 'cash' | 'bank_transfer' | 'cheque') => setRefundMethod(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="cheque">Cheque</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {refundMethod !== 'cash' && (
+              <div>
+                <Label htmlFor="refund-reference">Reference Number</Label>
+                <Input
+                  id="refund-reference"
+                  placeholder="Enter transaction/cheque reference"
+                  value={refundReference}
+                  onChange={(e) => setRefundReference(e.target.value)}
+                />
+              </div>
+            )}
+
+            <div className="bg-muted p-3 rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                <strong>Note:</strong> After processing this refund, {studentToProcess?.name} will be marked as left 
+                and removed from the system. This action cannot be undone.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setRefundDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleProcessRefund}
+              disabled={refundAmount <= 0 || (refundMethod !== 'cash' && !refundReference)}
+            >
+              Process Refund & Remove Student
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
