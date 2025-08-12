@@ -23,15 +23,6 @@ interface User {
   role: 'admin' | 'store_manager' | 'accounts';
   isActive: boolean;
   assignedStores: string[];
-  permissions: {
-    manageStudents: boolean;
-    manageWallets: boolean;
-    managePOS: boolean;
-    manageInventory: boolean;
-    viewReports: boolean;
-    manageUsers: boolean;
-    manageSettings: boolean;
-  };
   createdAt: Date;
   lastLogin?: Date;
 }
@@ -47,15 +38,6 @@ const UserManagement = () => {
       role: 'admin',
       isActive: true,
       assignedStores: [],
-      permissions: {
-        manageStudents: true,
-        manageWallets: true,
-        managePOS: true,
-        manageInventory: true,
-        viewReports: true,
-        manageUsers: true,
-        manageSettings: true,
-      },
       createdAt: new Date('2024-01-01'),
       lastLogin: new Date(),
     },
@@ -68,15 +50,6 @@ const UserManagement = () => {
       role: 'store_manager',
       isActive: true,
       assignedStores: [],
-      permissions: {
-        manageStudents: false,
-        manageWallets: false,
-        managePOS: true,
-        manageInventory: true,
-        viewReports: true,
-        manageUsers: false,
-        manageSettings: false,
-      },
       createdAt: new Date('2024-01-15'),
       lastLogin: new Date('2024-01-25'),
     },
@@ -91,15 +64,6 @@ const UserManagement = () => {
     mobile: '',
     role: 'store_manager' as User['role'],
     assignedStores: [] as string[],
-    permissions: {
-      manageStudents: false,
-      manageWallets: false,
-      managePOS: false,
-      manageInventory: false,
-      viewReports: false,
-      manageUsers: false,
-      manageSettings: false,
-    },
   });
 
   const { toast } = useToast();
@@ -111,36 +75,6 @@ const UserManagement = () => {
     { id: 'boys-bank', name: 'Boys Bank' },
   ];
 
-  const rolePermissions = {
-    admin: {
-      manageStudents: true,
-      manageWallets: true,
-      managePOS: true,
-      manageInventory: true,
-      viewReports: true,
-      manageUsers: true,
-      manageSettings: true,
-    },
-    store_manager: {
-      manageStudents: false,
-      manageWallets: false,
-      managePOS: true,
-      manageInventory: true,
-      viewReports: true,
-      manageUsers: false,
-      manageSettings: false,
-    },
-    accounts: {
-      manageStudents: true,
-      manageWallets: true,
-      managePOS: false,
-      manageInventory: false,
-      viewReports: true,
-      manageUsers: false,
-      manageSettings: false,
-    },
-  };
-
   const resetForm = () => {
     setFormData({
       name: '',
@@ -149,15 +83,6 @@ const UserManagement = () => {
       mobile: '',
       role: 'store_manager',
       assignedStores: [],
-      permissions: {
-        manageStudents: false,
-        manageWallets: false,
-        managePOS: false,
-        manageInventory: false,
-        viewReports: false,
-        manageUsers: false,
-        manageSettings: false,
-      },
     });
     setSelectedUser(null);
   };
@@ -172,7 +97,6 @@ const UserManagement = () => {
         mobile: user.mobile,
         role: user.role,
         assignedStores: user.assignedStores,
-        permissions: { ...user.permissions },
       });
     } else {
       resetForm();
@@ -184,7 +108,6 @@ const UserManagement = () => {
     setFormData({
       ...formData,
       role,
-      permissions: { ...rolePermissions[role] },
     });
   };
 
@@ -207,7 +130,6 @@ const UserManagement = () => {
       role: formData.role,
       isActive: selectedUser?.isActive ?? true,
       assignedStores: formData.assignedStores,
-      permissions: formData.permissions,
       createdAt: selectedUser?.createdAt || new Date(),
       lastLogin: selectedUser?.lastLogin,
     };
@@ -372,31 +294,6 @@ const UserManagement = () => {
                 </div>
               </div>
 
-              <div>
-                <Label>Permissions</Label>
-                <div className="grid grid-cols-2 gap-2 mt-2">
-                  {Object.entries(formData.permissions).map(([permission, value]) => (
-                    <div key={permission} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={permission}
-                        checked={value}
-                        onCheckedChange={(checked) => {
-                          setFormData({
-                            ...formData,
-                            permissions: {
-                              ...formData.permissions,
-                              [permission]: checked === true,
-                            },
-                          });
-                        }}
-                      />
-                      <Label htmlFor={permission} className="text-sm">
-                        {permission.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
 
             <DialogFooter>
@@ -546,15 +443,15 @@ const UserManagement = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-lg">
               <Store className="h-5 w-5 mr-2" />
-              Store Operations
+              Store Managers
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-2">
-              Users with POS and inventory management access
+              Users with store manager role
             </p>
             <div className="text-2xl font-bold">
-              {users.filter(u => u.permissions.managePOS || u.permissions.manageInventory).length}
+              {users.filter(u => u.role === 'store_manager').length}
             </div>
           </CardContent>
         </Card>
@@ -563,15 +460,15 @@ const UserManagement = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-lg">
               <CreditCard className="h-5 w-5 mr-2" />
-              Bank Operations
+              Accounts
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-2">
-              Users with wallet management access
+              Users with accounts role
             </p>
             <div className="text-2xl font-bold">
-              {users.filter(u => u.permissions.manageWallets).length}
+              {users.filter(u => u.role === 'accounts').length}
             </div>
           </CardContent>
         </Card>
