@@ -19,15 +19,11 @@ const StoreManagement = () => {
   const [newStore, setNewStore] = useState<{
     name: string;
     location: string;
-    type: 'tuckShop' | 'dryFoodShop' | 'generalStore';
-    requiresMenu: boolean;
-    assignedUserId: string;
+    type: 'tuckShop' | 'generalStore';
   }>({
     name: '',
     location: '',
-    type: 'generalStore',
-    requiresMenu: false,
-    assignedUserId: ''
+    type: 'generalStore'
   });
   const { toast } = useToast();
 
@@ -41,22 +37,18 @@ const StoreManagement = () => {
       return;
     }
 
-    const assignedUser = storeUsers.find(user => user.id === newStore.assignedUserId);
-    
     const store: StoreType = {
       id: `store_${Date.now()}`,
       name: newStore.name,
       type: newStore.type,
       location: newStore.location,
       isActive: true,
-      requiresMenu: newStore.requiresMenu,
-      assignedUserId: newStore.assignedUserId || undefined,
-      assignedUserName: assignedUser?.name,
+      requiresMenu: newStore.type === 'tuckShop',
       inventory: []
     };
 
     setStores([...stores, store]);
-    setNewStore({ name: '', location: '', type: 'generalStore', requiresMenu: false, assignedUserId: '' });
+    setNewStore({ name: '', location: '', type: 'generalStore' });
     setIsCreateDialogOpen(false);
 
     toast({
@@ -105,38 +97,13 @@ const StoreManagement = () => {
 
               <div>
                 <Label>Store Type</Label>
-                <Select value={newStore.type} onValueChange={(value: 'tuckShop' | 'dryFoodShop' | 'generalStore') => setNewStore({ ...newStore, type: value })}>
+                <Select value={newStore.type} onValueChange={(value: 'tuckShop' | 'generalStore') => setNewStore({ ...newStore, type: value })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select store type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="tuckShop">Tuck Shop (Food Items/Live Counter)</SelectItem>
-                    <SelectItem value="dryFoodShop">Dry Food Shop (Packaged Food)</SelectItem>
-                    <SelectItem value="generalStore">General Store (Grocery/Stationary)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  checked={newStore.requiresMenu}
-                  onCheckedChange={(checked) => setNewStore({ ...newStore, requiresMenu: checked })}
-                />
-                <Label>Requires Menu Management</Label>
-              </div>
-
-              <div>
-                <Label>Assign User (Optional)</Label>
-                <Select value={newStore.assignedUserId} onValueChange={(value) => setNewStore({ ...newStore, assignedUserId: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a user to assign" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {storeUsers.filter(user => user.isActive).map(user => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.name} ({user.role})
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="tuckShop">Live Counter</SelectItem>
+                    <SelectItem value="generalStore">General Store</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
