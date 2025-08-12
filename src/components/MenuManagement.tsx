@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,9 @@ import {
   Edit,
   Save,
   X,
-  ShoppingCart
+  ShoppingCart,
+  Search,
+  Filter
 } from 'lucide-react';
 import { mockWeeklyMenus, mockInventory } from '@/data/mockData';
 import type { WeeklyMenu, MenuCombo, InventoryItem } from '@/types/rfid-system';
@@ -32,6 +34,8 @@ const MenuManagement = () => {
   const [isAddingNewItem, setIsAddingNewItem] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>('');
   const [customMenuItems, setCustomMenuItems] = useState<InventoryItem[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
   const [newCombo, setNewCombo] = useState<Partial<MenuCombo>>({
     name: '',
     description: '',
@@ -50,6 +54,20 @@ const MenuManagement = () => {
 
   const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
   const tuckShopItems = [...mockInventory.filter(item => item.storeType === 'tuckShop'), ...customMenuItems];
+
+  // Filtered items based on search and category
+  const filteredItems = useMemo(() => {
+    return tuckShopItems.filter(item => {
+      const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = filterCategory === 'all' || item.category === filterCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [tuckShopItems, searchTerm, filterCategory]);
+
+  const categories = useMemo(() => {
+    const cats = [...new Set(tuckShopItems.map(item => item.category))];
+    return cats;
+  }, [tuckShopItems]);
 
   const handleCreateMenu = () => {
     const newMenu: WeeklyMenu = {
@@ -272,22 +290,23 @@ const MenuManagement = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Available Items */}
                             <div>
-                              <div className="flex justify-between items-center mb-2">
-                                <Label className="text-sm text-muted-foreground">Available Items</Label>
-                                <Dialog open={isAddingNewItem} onOpenChange={setIsAddingNewItem}>
-                                  <DialogTrigger asChild>
-                                    <Button 
-                                      size="sm" 
-                                      variant="outline"
-                                      onClick={() => {
-                                        setSelectedDay(day);
-                                        setIsAddingNewItem(true);
-                                      }}
-                                    >
-                                      <ShoppingCart className="h-3 w-3 mr-1" />
-                                      Quick Add
-                                    </Button>
-                                  </DialogTrigger>
+                              <div className="space-y-2 mb-2">
+                                <div className="flex justify-between items-center">
+                                  <Label className="text-sm text-muted-foreground">Available Items</Label>
+                                  <Dialog open={isAddingNewItem} onOpenChange={setIsAddingNewItem}>
+                                    <DialogTrigger asChild>
+                                      <Button 
+                                        size="sm" 
+                                        variant="outline"
+                                        onClick={() => {
+                                          setSelectedDay(day);
+                                          setIsAddingNewItem(true);
+                                        }}
+                                      >
+                                        <ShoppingCart className="h-3 w-3 mr-1" />
+                                        Quick Add
+                                      </Button>
+                                    </DialogTrigger>
                                   <DialogContent>
                                     <DialogHeader>
                                       <DialogTitle>Add New Menu Item</DialogTitle>
@@ -348,9 +367,38 @@ const MenuManagement = () => {
                                     </div>
                                   </DialogContent>
                                 </Dialog>
+                                </div>
+                                
+                                {/* Search and Filter */}
+                                <div className="flex gap-2">
+                                  <div className="relative flex-1">
+                                    <Search className="absolute left-2 top-2.5 h-3 w-3 text-muted-foreground" />
+                                    <Input
+                                      placeholder="Search items..."
+                                      value={searchTerm}
+                                      onChange={(e) => setSearchTerm(e.target.value)}
+                                      className="pl-7 h-8 text-xs"
+                                    />
+                                  </div>
+                                  <Select value={filterCategory} onValueChange={setFilterCategory}>
+                                    <SelectTrigger className="w-24 h-8 text-xs">
+                                      <Filter className="h-3 w-3 mr-1" />
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="all">All</SelectItem>
+                                      {categories.map(cat => (
+                                        <SelectItem key={cat} value={cat} className="capitalize">
+                                          {cat}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
                               </div>
+                              
                               <div className="max-h-32 overflow-y-auto border rounded p-2 space-y-1">
-                                {tuckShopItems.map(item => (
+                                {filteredItems.length > 0 ? filteredItems.map(item => (
                                   <div key={item.id} className="flex justify-between items-center text-sm">
                                     <span className="flex items-center">
                                       {item.name} (₹{item.price})
@@ -366,7 +414,11 @@ const MenuManagement = () => {
                                       <Plus className="h-3 w-3" />
                                     </Button>
                                   </div>
-                                ))}
+                                )) : (
+                                  <div className="text-center text-xs text-muted-foreground py-2">
+                                    {searchTerm || filterCategory !== 'all' ? 'No items match your search' : 'No items available'}
+                                  </div>
+                                )}
                               </div>
                             </div>
 
