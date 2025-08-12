@@ -16,9 +16,16 @@ const StoreManagement = () => {
   const [stores, setStores] = useState<StoreType[]>(mockStores);
   const [storeUsers] = useState<StoreUser[]>(mockStoreUsers);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [newStore, setNewStore] = useState({
+  const [newStore, setNewStore] = useState<{
+    name: string;
+    location: string;
+    type: 'tuckShop' | 'dryFoodShop' | 'generalStore';
+    requiresMenu: boolean;
+    assignedUserId: string;
+  }>({
     name: '',
     location: '',
+    type: 'generalStore',
     requiresMenu: false,
     assignedUserId: ''
   });
@@ -39,7 +46,7 @@ const StoreManagement = () => {
     const store: StoreType = {
       id: `store_${Date.now()}`,
       name: newStore.name,
-      type: 'generalStore', // Default type, can be changed
+      type: newStore.type,
       location: newStore.location,
       isActive: true,
       requiresMenu: newStore.requiresMenu,
@@ -49,7 +56,7 @@ const StoreManagement = () => {
     };
 
     setStores([...stores, store]);
-    setNewStore({ name: '', location: '', requiresMenu: false, assignedUserId: '' });
+    setNewStore({ name: '', location: '', type: 'generalStore', requiresMenu: false, assignedUserId: '' });
     setIsCreateDialogOpen(false);
 
     toast({
@@ -94,6 +101,20 @@ const StoreManagement = () => {
                   value={newStore.location}
                   onChange={(e) => setNewStore({ ...newStore, location: e.target.value })}
                 />
+              </div>
+
+              <div>
+                <Label>Store Type</Label>
+                <Select value={newStore.type} onValueChange={(value: 'tuckShop' | 'dryFoodShop' | 'generalStore') => setNewStore({ ...newStore, type: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select store type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="tuckShop">Tuck Shop (Food Items/Live Counter)</SelectItem>
+                    <SelectItem value="dryFoodShop">Dry Food Shop (Packaged Food)</SelectItem>
+                    <SelectItem value="generalStore">General Store (Grocery/Stationary)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex items-center space-x-2">
