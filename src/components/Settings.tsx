@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Palette, Monitor, Save, RefreshCw, Users, Cpu, Plus, Trash2 } from 'lucide-react';
+import { Palette, Monitor, Save, RefreshCw, Users, Cpu, Plus, Trash2, Edit, X } from 'lucide-react';
 import StudentManagement from './StudentManagement';
 import UserManagement from './UserManagement';
 import { mockStores } from '@/data/mockData';
@@ -14,6 +14,7 @@ import { mockStores } from '@/data/mockData';
 interface RfidReader {
   id: string;
   name: string;
+  deviceId: string;
   ipAddress: string;
   port: string;
   storeId: string;
@@ -28,6 +29,7 @@ const Settings = () => {
     {
       id: 'reader_1',
       name: 'Main Tuck Shop Reader',
+      deviceId: 'DEV001',
       ipAddress: '192.168.1.10',
       port: '8080',
       storeId: 'store_1',
@@ -37,6 +39,7 @@ const Settings = () => {
     {
       id: 'reader_2',
       name: 'General Store Reader',
+      deviceId: 'DEV002',
       ipAddress: '192.168.1.11',
       port: '8080',
       storeId: 'store_3',
@@ -46,10 +49,12 @@ const Settings = () => {
   ]);
   const [newReader, setNewReader] = useState({
     name: '',
+    deviceId: '',
     ipAddress: '',
     port: '8080',
     storeId: ''
   });
+  const [editingReader, setEditingReader] = useState<string | null>(null);
   const { toast } = useToast();
 
   const themes = [
@@ -146,7 +151,7 @@ const Settings = () => {
   };
 
   const addRfidReader = () => {
-    if (!newReader.name || !newReader.ipAddress || !newReader.storeId) {
+    if (!newReader.name || !newReader.deviceId || !newReader.ipAddress || !newReader.storeId) {
       toast({
         title: 'Error',
         description: 'Please fill in all required fields',
@@ -160,6 +165,7 @@ const Settings = () => {
     const reader: RfidReader = {
       id: `reader_${Date.now()}`,
       name: newReader.name,
+      deviceId: newReader.deviceId,
       ipAddress: newReader.ipAddress,
       port: newReader.port,
       storeId: newReader.storeId,
@@ -168,7 +174,7 @@ const Settings = () => {
     };
 
     setRfidReaders([...rfidReaders, reader]);
-    setNewReader({ name: '', ipAddress: '', port: '8080', storeId: '' });
+    setNewReader({ name: '', deviceId: '', ipAddress: '', port: '8080', storeId: '' });
     
     toast({
       title: 'RFID Reader Added',
@@ -184,16 +190,58 @@ const Settings = () => {
     });
   };
 
-  const toggleReaderStatus = (readerId: string) => {
+  const startEditReader = (readerId: string) => {
+    const reader = rfidReaders.find(r => r.id === readerId);
+    if (reader) {
+      setNewReader({
+        name: reader.name,
+        deviceId: reader.deviceId,
+        ipAddress: reader.ipAddress,
+        port: reader.port,
+        storeId: reader.storeId
+      });
+      setEditingReader(readerId);
+    }
+  };
+
+  const saveEditReader = () => {
+    if (!newReader.name || !newReader.deviceId || !newReader.ipAddress || !newReader.storeId) {
+      toast({
+        title: 'Error',
+        description: 'Please fill in all required fields',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const selectedStore = mockStores.find(store => store.id === newReader.storeId);
+    
     setRfidReaders(rfidReaders.map(reader => 
-      reader.id === readerId 
-        ? { ...reader, isActive: !reader.isActive }
+      reader.id === editingReader 
+        ? { 
+            ...reader, 
+            name: newReader.name,
+            deviceId: newReader.deviceId,
+            ipAddress: newReader.ipAddress,
+            port: newReader.port,
+            storeId: newReader.storeId,
+            storeName: selectedStore?.name || ''
+          }
         : reader
     ));
+    
+    setNewReader({ name: '', deviceId: '', ipAddress: '', port: '8080', storeId: '' });
+    setEditingReader(null);
+    
     toast({
-      title: 'Status Updated',
-      description: 'RFID reader status has been updated',
+      title: 'RFID Reader Updated',
+      description: 'RFID reader has been updated successfully',
     });
+  };
+
+  const cancelEdit = () => {
+    setNewReader({ name: '', deviceId: '', ipAddress: '', port: '8080', storeId: '' });
+    setEditingReader(null);
   };
 
   return (
@@ -353,14 +401,22 @@ const Settings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Add New RFID Reader */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 p-4 border rounded-lg">
+              {/* Add/Edit RFID Reader */}
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 border rounded-lg">
                 <div>
                   <Label>Reader Name</Label>
                   <Input
                     placeholder="e.g., Main Counter Reader"
                     value={newReader.name}
                     onChange={(e) => setNewReader({ ...newReader, name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Device ID</Label>
+                  <Input
+                    placeholder="e.g., DEV001"
+                    value={newReader.deviceId}
+                    onChange={(e) => setNewReader({ ...newReader, deviceId: e.target.value })}
                   />
                 </div>
                 <div>
@@ -394,11 +450,23 @@ const Settings = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex items-end">
-                  <Button onClick={addRfidReader} className="w-full">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Reader
-                  </Button>
+                <div className="flex items-end space-x-2">
+                  {editingReader ? (
+                    <>
+                      <Button onClick={saveEditReader} className="flex-1">
+                        <Save className="h-4 w-4 mr-2" />
+                        Save
+                      </Button>
+                      <Button onClick={cancelEdit} variant="outline">
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </>
+                  ) : (
+                    <Button onClick={addRfidReader} className="w-full">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Reader
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -413,10 +481,14 @@ const Settings = () => {
                   <div className="space-y-3">
                     {rfidReaders.map(reader => (
                       <div key={reader.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1">
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 flex-1">
                           <div>
                             <Label className="text-sm font-medium">Reader Name</Label>
                             <p className="text-sm text-muted-foreground">{reader.name}</p>
+                          </div>
+                          <div>
+                            <Label className="text-sm font-medium">Device ID</Label>
+                            <p className="text-sm text-muted-foreground">{reader.deviceId}</p>
                           </div>
                           <div>
                             <Label className="text-sm font-medium">Network</Label>
@@ -440,9 +512,9 @@ const Settings = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => toggleReaderStatus(reader.id)}
+                            onClick={() => startEditReader(reader.id)}
                           >
-                            {reader.isActive ? 'Deactivate' : 'Activate'}
+                            <Edit className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="destructive"
