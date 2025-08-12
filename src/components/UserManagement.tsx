@@ -18,7 +18,9 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'store_manager' | 'cashier' | 'bank_manager' | 'inventory_manager';
+  password: string;
+  mobile: string;
+  role: 'admin' | 'store_manager' | 'accounts';
   isActive: boolean;
   assignedStores: string[];
   permissions: {
@@ -40,6 +42,8 @@ const UserManagement = () => {
       id: '1',
       name: 'John Admin',
       email: 'admin@doonschool.com',
+      password: 'admin123',
+      mobile: '+91-9876543210',
       role: 'admin',
       isActive: true,
       assignedStores: [],
@@ -57,16 +61,18 @@ const UserManagement = () => {
     },
     {
       id: '2',
-      name: 'Sarah Bank Manager',
-      email: 'bank@doonschool.com',
-      role: 'bank_manager',
+      name: 'Sarah Store Manager',
+      email: 'store@doonschool.com',
+      password: 'store123',
+      mobile: '+91-9876543211',
+      role: 'store_manager',
       isActive: true,
       assignedStores: [],
       permissions: {
-        manageStudents: true,
-        manageWallets: true,
-        managePOS: false,
-        manageInventory: false,
+        manageStudents: false,
+        manageWallets: false,
+        managePOS: true,
+        manageInventory: true,
         viewReports: true,
         manageUsers: false,
         manageSettings: false,
@@ -81,7 +87,9 @@ const UserManagement = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    role: 'cashier' as User['role'],
+    password: '',
+    mobile: '',
+    role: 'store_manager' as User['role'],
     assignedStores: [] as string[],
     permissions: {
       manageStudents: false,
@@ -122,29 +130,11 @@ const UserManagement = () => {
       manageUsers: false,
       manageSettings: false,
     },
-    cashier: {
-      manageStudents: false,
-      manageWallets: false,
-      managePOS: true,
-      manageInventory: false,
-      viewReports: false,
-      manageUsers: false,
-      manageSettings: false,
-    },
-    bank_manager: {
+    accounts: {
       manageStudents: true,
       manageWallets: true,
       managePOS: false,
       manageInventory: false,
-      viewReports: true,
-      manageUsers: false,
-      manageSettings: false,
-    },
-    inventory_manager: {
-      manageStudents: false,
-      manageWallets: false,
-      managePOS: false,
-      manageInventory: true,
       viewReports: true,
       manageUsers: false,
       manageSettings: false,
@@ -155,7 +145,9 @@ const UserManagement = () => {
     setFormData({
       name: '',
       email: '',
-      role: 'cashier',
+      password: '',
+      mobile: '',
+      role: 'store_manager',
       assignedStores: [],
       permissions: {
         manageStudents: false,
@@ -176,6 +168,8 @@ const UserManagement = () => {
       setFormData({
         name: user.name,
         email: user.email,
+        password: user.password,
+        mobile: user.mobile,
         role: user.role,
         assignedStores: user.assignedStores,
         permissions: { ...user.permissions },
@@ -195,7 +189,7 @@ const UserManagement = () => {
   };
 
   const handleSave = () => {
-    if (!formData.name || !formData.email) {
+    if (!formData.name || !formData.email || !formData.password || !formData.mobile) {
       toast({
         title: 'Error',
         description: 'Please fill in all required fields',
@@ -208,6 +202,8 @@ const UserManagement = () => {
       id: selectedUser?.id || Date.now().toString(),
       name: formData.name,
       email: formData.email,
+      password: formData.password,
+      mobile: formData.mobile,
       role: formData.role,
       isActive: selectedUser?.isActive ?? true,
       assignedStores: formData.assignedStores,
@@ -257,8 +253,7 @@ const UserManagement = () => {
     switch (role) {
       case 'admin': return 'bg-red-500/10 text-red-500 border-red-500/20';
       case 'store_manager': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      case 'bank_manager': return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'inventory_manager': return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
+      case 'accounts': return 'bg-green-500/10 text-green-500 border-green-500/20';
       default: return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
     }
   };
@@ -299,13 +294,36 @@ const UserManagement = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">Email (Username) *</Label>
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="Enter email address"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="password">Password *</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="Enter password"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="mobile">Mobile Number *</Label>
+                  <Input
+                    id="mobile"
+                    type="tel"
+                    value={formData.mobile}
+                    onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                    placeholder="Enter mobile number"
                   />
                 </div>
               </div>
@@ -319,9 +337,7 @@ const UserManagement = () => {
                   <SelectContent>
                     <SelectItem value="admin">Administrator</SelectItem>
                     <SelectItem value="store_manager">Store Manager</SelectItem>
-                    <SelectItem value="cashier">Cashier</SelectItem>
-                    <SelectItem value="bank_manager">Bank Manager</SelectItem>
-                    <SelectItem value="inventory_manager">Inventory Manager</SelectItem>
+                    <SelectItem value="accounts">Accounts</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -410,6 +426,7 @@ const UserManagement = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>User</TableHead>
+                <TableHead>Mobile</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Assigned Stores</TableHead>
                 <TableHead>Status</TableHead>
@@ -425,6 +442,9 @@ const UserManagement = () => {
                       <div className="font-medium">{user.name}</div>
                       <div className="text-sm text-muted-foreground">{user.email}</div>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm">{user.mobile}</span>
                   </TableCell>
                   <TableCell>
                     <Badge className={getRoleBadgeColor(user.role)}>
