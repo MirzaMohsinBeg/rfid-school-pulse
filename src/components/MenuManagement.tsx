@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Calendar,
@@ -18,7 +19,8 @@ import {
   Clock,
   Edit,
   Save,
-  X
+  X,
+  ShoppingCart
 } from 'lucide-react';
 import { mockWeeklyMenus, mockInventory } from '@/data/mockData';
 import type { WeeklyMenu, MenuCombo, InventoryItem } from '@/types/rfid-system';
@@ -27,6 +29,9 @@ const MenuManagement = () => {
   const [weeklyMenus] = useState<WeeklyMenu[]>(mockWeeklyMenus);
   const [selectedMenu, setSelectedMenu] = useState<WeeklyMenu | null>(null);
   const [isCreatingCombo, setIsCreatingCombo] = useState(false);
+  const [isAddingNewItem, setIsAddingNewItem] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<string>('');
+  const [customMenuItems, setCustomMenuItems] = useState<InventoryItem[]>([]);
   const [newCombo, setNewCombo] = useState<Partial<MenuCombo>>({
     name: '',
     description: '',
@@ -35,10 +40,16 @@ const MenuManagement = () => {
     isActive: true,
     availableDays: []
   });
+  const [newMenuItem, setNewMenuItem] = useState({
+    name: '',
+    price: 0,
+    category: 'food',
+    description: ''
+  });
   const { toast } = useToast();
 
   const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-  const tuckShopItems = mockInventory.filter(item => item.storeType === 'tuckShop');
+  const tuckShopItems = [...mockInventory.filter(item => item.storeType === 'tuckShop'), ...customMenuItems];
 
   const handleCreateMenu = () => {
     const newMenu: WeeklyMenu = {
@@ -143,6 +154,48 @@ const MenuManagement = () => {
     return totalItemPrice - combo.comboPrice;
   };
 
+  const handleAddCustomMenuItem = () => {
+    if (!newMenuItem.name || !newMenuItem.price) {
+      toast({
+        title: "Invalid Item",
+        description: "Please provide item name and price",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const customItem: InventoryItem = {
+      id: `custom_${Date.now()}`,
+      name: newMenuItem.name,
+      category: newMenuItem.category,
+      price: newMenuItem.price,
+      stock: 999, // Unlimited for menu items
+      minStockLevel: 0,
+      storeType: 'tuckShop'
+    };
+
+    setCustomMenuItems([...customMenuItems, customItem]);
+    
+    // Auto-add to selected day if specified
+    if (selectedDay && selectedMenu) {
+      addItemToDay(selectedDay, customItem);
+    }
+
+    setNewMenuItem({
+      name: '',
+      price: 0,
+      category: 'food',
+      description: ''
+    });
+    setIsAddingNewItem(false);
+    setSelectedDay('');
+
+    toast({
+      title: "Item Added",
+      description: `${customItem.name} has been added to menu items`
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -219,11 +272,92 @@ const MenuManagement = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Available Items */}
                             <div>
-                              <Label className="text-sm text-muted-foreground">Available Items</Label>
+                              <div className="flex justify-between items-center mb-2">
+                                <Label className="text-sm text-muted-foreground">Available Items</Label>
+                                <Dialog open={isAddingNewItem} onOpenChange={setIsAddingNewItem}>
+                                  <DialogTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      onClick={() => {
+                                        setSelectedDay(day);
+                                        setIsAddingNewItem(true);
+                                      }}
+                                    >
+                                      <ShoppingCart className="h-3 w-3 mr-1" />
+                                      Quick Add
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>Add New Menu Item</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-4">
+                                      <div>
+                                        <Label>Item Name</Label>
+                                        <Input
+                                          placeholder="e.g., Paneer Sandwich"
+                                          value={newMenuItem.name}
+                                          onChange={(e) => setNewMenuItem({ ...newMenuItem, name: e.target.value })}
+                                        />
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                          <Label>Price (₹)</Label>
+                                          <Input
+                                            type="number"
+                                            placeholder="25"
+                                            value={newMenuItem.price}
+                                            onChange={(e) => setNewMenuItem({ ...newMenuItem, price: Number(e.target.value) })}
+                                          />
+                                        </div>
+                                        <div>
+                                          <Label>Category</Label>
+                                          <Select 
+                                            value={newMenuItem.category} 
+                                            onValueChange={(value) => setNewMenuItem({ ...newMenuItem, category: value })}
+                                          >
+                                            <SelectTrigger>
+                                              <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              <SelectItem value="food">Food</SelectItem>
+                                              <SelectItem value="beverage">Beverage</SelectItem>
+                                              <SelectItem value="snack">Snack</SelectItem>
+                                              <SelectItem value="dessert">Dessert</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <Label>Description (Optional)</Label>
+                                        <Textarea
+                                          placeholder="Brief description of the item..."
+                                          value={newMenuItem.description}
+                                          onChange={(e) => setNewMenuItem({ ...newMenuItem, description: e.target.value })}
+                                        />
+                                      </div>
+                                      <div className="flex justify-end space-x-2">
+                                        <Button variant="outline" onClick={() => setIsAddingNewItem(false)}>
+                                          Cancel
+                                        </Button>
+                                        <Button onClick={handleAddCustomMenuItem}>
+                                          Add Item
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                              </div>
                               <div className="max-h-32 overflow-y-auto border rounded p-2 space-y-1">
                                 {tuckShopItems.map(item => (
                                   <div key={item.id} className="flex justify-between items-center text-sm">
-                                    <span>{item.name} (₹{item.price})</span>
+                                    <span className="flex items-center">
+                                      {item.name} (₹{item.price})
+                                      {item.id.startsWith('custom_') && (
+                                        <Badge variant="secondary" className="ml-1 text-xs">New</Badge>
+                                      )}
+                                    </span>
                                     <Button
                                       size="sm"
                                       variant="outline"
