@@ -64,6 +64,9 @@ const StudentManagement = () => {
     admissionNumber: '',
     name: '',
     fatherName: '',
+    motherName: '',
+    mobileNumber: '',
+    email: '',
     class: '',
     section: '',
     session: '2024-25',
@@ -111,6 +114,9 @@ const StudentManagement = () => {
       admissionNumber: '',
       name: '',
       fatherName: '',
+      motherName: '',
+      mobileNumber: '',
+      email: '',
       class: '',
       section: '',
       session: '2024-25',
@@ -139,6 +145,9 @@ const StudentManagement = () => {
       session: formData.session,
       admissionNumber: formData.admissionNumber,
       fatherName: formData.fatherName,
+      motherName: formData.motherName,
+      mobileNumber: formData.mobileNumber,
+      email: formData.email,
       rfidCardNumber: formData.rfidCardNumber || `RFID-${Date.now()}`,
       walletBalance: formData.walletBalance,
       isActive: true,
@@ -493,6 +502,9 @@ const StudentManagement = () => {
       admissionNumber: student.admissionNumber,
       name: student.name,
       fatherName: student.fatherName || '',
+      motherName: student.motherName || '',
+      mobileNumber: student.mobileNumber || '',
+      email: student.email || '',
       class: student.class,
       section: student.section,
       session: student.session,
@@ -720,6 +732,15 @@ const StudentManagement = () => {
             placeholder="Enter father's name"
           />
         </div>
+        <div>
+          <Label htmlFor="motherName">Mother's Name</Label>
+          <Input
+            id="motherName"
+            value={formData.motherName || ''}
+            onChange={(e) => setFormData(prev => ({ ...prev, motherName: e.target.value }))}
+            placeholder="Enter mother's name"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -775,14 +796,28 @@ const StudentManagement = () => {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="rfidCard">RFID Card Number</Label>
+          <Label htmlFor="mobileNumber">Mobile Number</Label>
           <Input
-            id="rfidCard"
-            value={formData.rfidCardNumber}
-            onChange={(e) => setFormData(prev => ({ ...prev, rfidCardNumber: e.target.value }))}
-            placeholder="Auto-generated if empty"
+            id="mobileNumber"
+            type="tel"
+            value={formData.mobileNumber || ''}
+            onChange={(e) => setFormData(prev => ({ ...prev, mobileNumber: e.target.value }))}
+            placeholder="Enter mobile number"
           />
         </div>
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={formData.email || ''}
+            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+            placeholder="Enter email address"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="walletBalance">Initial Wallet Balance</Label>
           <Input
@@ -793,6 +828,7 @@ const StudentManagement = () => {
             placeholder="0"
           />
         </div>
+        <div></div>
       </div>
     </div>
   );

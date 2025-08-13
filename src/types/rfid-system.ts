@@ -16,6 +16,9 @@ export interface Student {
   session: string; // Academic session/year (e.g., "2024-25")
   admissionNumber: string;
   fatherName?: string;
+  motherName?: string;
+  mobileNumber?: string;
+  email?: string;
   rfidCardNumber: string;
   walletBalance: number;
   isActive: boolean;
