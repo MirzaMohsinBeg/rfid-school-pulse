@@ -700,7 +700,26 @@ const StudentManagement = () => {
           />
           {photoFile && (
             <div className="mt-2">
-              <p className="text-sm text-muted-foreground">Selected: {photoFile.name}</p>
+              <p className="text-sm text-muted-foreground mb-2">Selected: {photoFile.name}</p>
+              <div className="w-20 h-20 border border-border rounded-lg overflow-hidden">
+                <img 
+                  src={formData.photoUrl} 
+                  alt="Photo preview" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          )}
+          {!photoFile && formData.photoUrl && (
+            <div className="mt-2">
+              <p className="text-sm text-muted-foreground mb-2">Current photo:</p>
+              <div className="w-20 h-20 border border-border rounded-lg overflow-hidden">
+                <img 
+                  src={formData.photoUrl} 
+                  alt="Current photo" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
           )}
         </div>
