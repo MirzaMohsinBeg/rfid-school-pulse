@@ -704,22 +704,6 @@ const StudentManagement = () => {
         </div>
       </div>
       
-      {/* Photo Preview - Upper Left */}
-      {(photoFile || (!photoFile && formData.photoUrl)) && (
-        <div className="absolute top-4 left-4 bg-background border border-border rounded-lg p-2 shadow-lg">
-          <p className="text-xs text-muted-foreground mb-2">
-            {photoFile ? 'New Photo' : 'Current Photo'}
-          </p>
-          <div className="w-16 h-16 border border-border rounded-lg overflow-hidden">
-            <img 
-              src={formData.photoUrl} 
-              alt="Photo preview" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-      )}
-      
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="name">Student Name *</Label>
@@ -870,10 +854,29 @@ const StudentManagement = () => {
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                      <DialogTitle>Add New Student</DialogTitle>
-                      <DialogDescription>
-                        Enter student details and RFID card information
-                      </DialogDescription>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <DialogTitle>Add New Student</DialogTitle>
+                          <DialogDescription>
+                            Enter student details and RFID card information
+                          </DialogDescription>
+                        </div>
+                        {/* Photo Preview in Header */}
+                        {(photoFile || formData.photoUrl) && (
+                          <div className="flex flex-col items-center space-y-2">
+                            <p className="text-xs text-muted-foreground">
+                              {photoFile ? 'New Photo' : 'Current Photo'}
+                            </p>
+                            <div className="w-16 h-16 border border-border rounded-lg overflow-hidden bg-muted">
+                              <img 
+                                src={formData.photoUrl} 
+                                alt="Photo preview" 
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </DialogHeader>
                     <StudentForm />
                     <div className="flex justify-end space-x-2">
@@ -1663,10 +1666,29 @@ const StudentManagement = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Edit Student Profile</DialogTitle>
-            <DialogDescription>
-              Update student details and RFID card information
-            </DialogDescription>
+            <div className="flex items-start justify-between">
+              <div>
+                <DialogTitle>Edit Student Profile</DialogTitle>
+                <DialogDescription>
+                  Update student details and RFID card information
+                </DialogDescription>
+              </div>
+              {/* Photo Preview in Header */}
+              {(photoFile || formData.photoUrl) && (
+                <div className="flex flex-col items-center space-y-2">
+                  <p className="text-xs text-muted-foreground">
+                    {photoFile ? 'New Photo' : 'Current Photo'}
+                  </p>
+                  <div className="w-16 h-16 border border-border rounded-lg overflow-hidden bg-muted">
+                    <img 
+                      src={formData.photoUrl} 
+                      alt="Photo preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </DialogHeader>
           <StudentForm isEdit={true} />
           <div className="flex justify-end space-x-2">
