@@ -871,10 +871,10 @@ const StudentManagement = () => {
                       Add Student
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
+                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <div className="flex items-start justify-between">
-                        <div>
+                        <div className="flex-1 min-w-0">
                           <DialogTitle>Add New Student</DialogTitle>
                           <DialogDescription>
                             Enter student details and RFID card information
@@ -882,7 +882,7 @@ const StudentManagement = () => {
                         </div>
                         {/* Photo Preview in Header */}
                         {(photoFile || formData.photoUrl) && (
-                          <div className="flex flex-col items-center space-y-2 mr-20">
+                          <div className="flex flex-col items-center space-y-2 ml-4 flex-shrink-0">
                             <p className="text-xs text-muted-foreground">
                               {photoFile ? 'New Photo' : 'Current Photo'}
                             </p>
@@ -893,8 +893,8 @@ const StudentManagement = () => {
                                 className="w-full h-full object-cover"
                               />
                             </div>
-                            <p className="text-xs text-muted-foreground text-center max-w-32 truncate">
-                              {photoFile ? photoFile.name : formData.photoUrl}
+                            <p className="text-xs text-muted-foreground text-center max-w-20 truncate">
+                              {photoFile ? photoFile.name : 'Current'}
                             </p>
                           </div>
                         )}
