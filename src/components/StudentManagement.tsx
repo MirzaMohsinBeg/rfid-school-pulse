@@ -11,9 +11,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Users, UserPlus, Upload, Edit, Trash2, CreditCard, AlertTriangle, History, Clock, Plus } from 'lucide-react';
+import { Users, UserPlus, Upload, Edit, Trash2, CreditCard, AlertTriangle, History, Clock, Plus, CalendarIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import { Student, StudentRefund, LeftStudent } from '@/types/rfid-system';
 import { mockStudents } from '@/data/mockData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
@@ -46,6 +50,8 @@ const StudentManagement = () => {
     '2023-24', '2024-25', '2025-26'
   ]);
   const [newSession, setNewSession] = useState('');
+  const [sessionStartDate, setSessionStartDate] = useState<Date | undefined>(undefined);
+  const [sessionEndDate, setSessionEndDate] = useState<Date | undefined>(undefined);
   const [isAddSessionDialogOpen, setIsAddSessionDialogOpen] = useState(false);
 
   // Get available classes in order
@@ -217,13 +223,21 @@ const StudentManagement = () => {
 
   // Add new session
   const handleAddSession = () => {
-    if (newSession && !sessions.includes(newSession)) {
+    if (newSession && sessionStartDate && sessionEndDate && !sessions.includes(newSession)) {
       setSessions(prev => [...prev, newSession].sort());
       setNewSession('');
+      setSessionStartDate(undefined);
+      setSessionEndDate(undefined);
       setIsAddSessionDialogOpen(false);
       toast({
         title: "Session Added",
-        description: `Session ${newSession} has been added successfully.`,
+        description: `Session ${newSession} (${format(sessionStartDate, "MMM dd, yyyy")} - ${format(sessionEndDate, "MMM dd, yyyy")}) has been added successfully.`,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields including session name and dates.",
+        variant: "destructive"
       });
     }
   };
@@ -533,6 +547,63 @@ const StudentManagement = () => {
                 value={newSession}
                 onChange={(e) => setNewSession(e.target.value)}
               />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Session Start Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !sessionStartDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {sessionStartDate ? format(sessionStartDate, "PPP") : <span>Pick start date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={sessionStartDate}
+                      onSelect={setSessionStartDate}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              
+              <div>
+                <Label>Session End Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !sessionEndDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {sessionEndDate ? format(sessionEndDate, "PPP") : <span>Pick end date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={sessionEndDate}
+                      onSelect={setSessionEndDate}
+                      disabled={(date) => sessionStartDate && date < sessionStartDate}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </div>
           <div className="flex justify-end space-x-2">
