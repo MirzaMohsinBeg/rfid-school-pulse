@@ -446,6 +446,59 @@ export const mockStudents: Student[] = [
     weeklySpendingLimits: { tuckShop: 250, dryFoodShop: 250, generalStore: 200 },
     currentWeekSpending: { tuckShop: 190, dryFoodShop: 110, generalStore: 90 },
     lastTransaction: new Date('2024-02-08T12:20:00')
+  },
+
+  // Students without RFID cards (for testing assign functionality)
+  {
+    id: '101',
+    name: 'Rahul Verma',
+    class: '6',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM101',
+    fatherName: 'Suresh Verma',
+    rfidCardNumber: '',
+    walletBalance: 0,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [],
+    weeklySpendingLimits: { tuckShop: 150, dryFoodShop: 150, generalStore: 100 },
+    currentWeekSpending: { tuckShop: 0, dryFoodShop: 0, generalStore: 0 }
+  },
+  {
+    id: '102',
+    name: 'Priyanka Jain',
+    class: '7',
+    section: 'A',
+    session: '2024-25',
+    admissionNumber: 'ADM102',
+    fatherName: 'Anil Jain',
+    motherName: 'Sunita Jain',
+    mobileNumber: '9876543210',
+    email: 'priyanka.jain@example.com',
+    rfidCardNumber: '',
+    walletBalance: 0,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b03c?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [],
+    weeklySpendingLimits: { tuckShop: 175, dryFoodShop: 175, generalStore: 125 },
+    currentWeekSpending: { tuckShop: 0, dryFoodShop: 0, generalStore: 0 }
+  },
+  {
+    id: '103',
+    name: 'Vikram Singh',
+    class: '8',
+    section: 'B',
+    session: '2024-25',
+    admissionNumber: 'ADM103',
+    fatherName: 'Rajesh Singh',
+    rfidCardNumber: '',
+    walletBalance: 0,
+    isActive: true,
+    photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&h=120&fit=crop&crop=face',
+    rfidCardHistory: [],
+    weeklySpendingLimits: { tuckShop: 200, dryFoodShop: 200, generalStore: 150 },
+    currentWeekSpending: { tuckShop: 0, dryFoodShop: 0, generalStore: 0 }
   }
 ];
 

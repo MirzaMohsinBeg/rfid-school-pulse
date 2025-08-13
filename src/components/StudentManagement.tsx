@@ -676,7 +676,7 @@ const StudentManagement = () => {
                               <Badge variant={student.rfidCardNumber ? "default" : "secondary"}>
                                 {student.rfidCardNumber || "No Card"}
                               </Badge>
-                              {!student.rfidCardNumber && (
+                              {!student.rfidCardNumber ? (
                                 <Button 
                                   size="sm" 
                                   variant="outline"
@@ -687,6 +687,19 @@ const StudentManagement = () => {
                                 >
                                   <CreditCard className="h-4 w-4 mr-1" />
                                   Assign
+                                </Button>
+                              ) : (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => {
+                                    setSelectedStudentForCard(student);
+                                    setIsRfidScanOpen(true);
+                                  }}
+                                  title="Reassign RFID Card"
+                                >
+                                  <CreditCard className="h-4 w-4 mr-1" />
+                                  Change
                                 </Button>
                               )}
                             </div>
@@ -720,7 +733,28 @@ const StudentManagement = () => {
                                   </TooltipContent>
                                 </Tooltip>
                               </TooltipProvider>
-                              <Button size="sm" variant="outline">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedStudent(student);
+                                  setFormData({
+                                    admissionNumber: student.admissionNumber,
+                                    name: student.name,
+                                    fatherName: student.fatherName || '',
+                                    motherName: student.motherName || '',
+                                    mobileNumber: student.mobileNumber || '',
+                                    email: student.email || '',
+                                    class: student.class,
+                                    section: student.section,
+                                    session: student.session,
+                                    photoUrl: student.photoUrl || '',
+                                    rfidCardNumber: student.rfidCardNumber,
+                                    walletBalance: student.walletBalance
+                                  });
+                                  setIsEditDialogOpen(true);
+                                }}
+                              >
                                 <Edit className="h-4 w-4" />
                               </Button>
                             </div>
@@ -864,6 +898,162 @@ const StudentManagement = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Edit Student Dialog */}
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Edit Student</DialogTitle>
+                <DialogDescription>
+                  Update student details and information
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="editAdmissionNumber">Admission Number</Label>
+                  <Input
+                    id="editAdmissionNumber"
+                    value={formData.admissionNumber}
+                    onChange={(e) => setFormData(prev => ({ ...prev, admissionNumber: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="editName">Full Name</Label>
+                  <Input
+                    id="editName"
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="editFatherName">Father's Name</Label>
+                  <Input
+                    id="editFatherName"
+                    value={formData.fatherName}
+                    onChange={(e) => setFormData(prev => ({ ...prev, fatherName: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="editMotherName">Mother's Name</Label>
+                  <Input
+                    id="editMotherName"
+                    value={formData.motherName}
+                    onChange={(e) => setFormData(prev => ({ ...prev, motherName: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="editClass">Class</Label>
+                  <Select value={formData.class} onValueChange={(value) => setFormData(prev => ({ ...prev, class: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getClassOrder().map(cls => (
+                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="editSection">Section</Label>
+                  <Select value={formData.section} onValueChange={(value) => setFormData(prev => ({ ...prev, section: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Section" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['A', 'B', 'C', 'D'].map(section => (
+                        <SelectItem key={section} value={section}>{section}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="editMobile">Mobile Number</Label>
+                  <Input
+                    id="editMobile"
+                    type="tel"
+                    value={formData.mobileNumber}
+                    onChange={(e) => setFormData(prev => ({ ...prev, mobileNumber: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="editEmail">Email</Label>
+                  <Input
+                    id="editEmail"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="editRfidCard">RFID Card Number</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="editRfidCard"
+                      value={formData.rfidCardNumber}
+                      onChange={(e) => setFormData(prev => ({ ...prev, rfidCardNumber: e.target.value }))}
+                      placeholder="Card number"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedStudentForCard(selectedStudent);
+                        setIsRfidScanOpen(true);
+                      }}
+                    >
+                      <CreditCard className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="editWalletBalance">Wallet Balance</Label>
+                  <Input
+                    id="editWalletBalance"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.walletBalance}
+                    onChange={(e) => setFormData(prev => ({ ...prev, walletBalance: parseFloat(e.target.value) || 0 }))}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={() => {
+                  if (selectedStudent) {
+                    setStudents(prev => prev.map(s => 
+                      s.id === selectedStudent.id ? {
+                        ...s,
+                        ...formData,
+                        rfidCardHistory: formData.rfidCardNumber !== selectedStudent.rfidCardNumber 
+                          ? [...s.rfidCardHistory, {
+                              id: Date.now().toString(),
+                              cardNumber: formData.rfidCardNumber,
+                              action: 'transferred',
+                              timestamp: new Date(),
+                              processedBy: 'Admin',
+                              previousOwner: selectedStudent.rfidCardNumber
+                            }]
+                          : s.rfidCardHistory
+                      } : s
+                    ));
+                    
+                    setIsEditDialogOpen(false);
+                    setSelectedStudent(null);
+                    toast({
+                      title: "Student Updated",
+                      description: `${formData.name} has been updated successfully.`,
+                    });
+                  }
+                }}>
+                  Update Student
+                </Button>
               </div>
             </DialogContent>
           </Dialog>
