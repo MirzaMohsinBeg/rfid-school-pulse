@@ -242,7 +242,6 @@ const StudentManagement = () => {
     }
   };
 
-  // Simple component that shows aligned buttons and basic structure
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -393,22 +392,18 @@ const StudentManagement = () => {
                                     </div>
                                     <div className="max-h-32 overflow-y-auto border rounded p-2 space-y-1">
                                       {studentsInClass.map(student => (
-                                        <div key={student.id} className="flex items-center space-x-2">
+                                        <label key={student.id} className="flex items-center space-x-2 text-sm">
                                           <input
                                             type="checkbox"
                                             checked={promotion.selectedStudents.includes(student.id)}
                                             onChange={() => toggleStudentSelection(index, student.id)}
                                             className="rounded"
                                           />
-                                          <span className="text-sm">{student.name} (ID: {student.id})</span>
-                                        </div>
+                                          <span>{student.name} - {student.admissionNumber}</span>
+                                        </label>
                                       ))}
                                     </div>
                                   </div>
-                                )}
-
-                                {promotion.class && studentsInClass.length === 0 && (
-                                  <p className="text-sm text-muted-foreground">No students found in Class {promotion.class} for session {promotionData.fromSession}</p>
                                 )}
                               </div>
                             );
@@ -419,10 +414,13 @@ const StudentManagement = () => {
                         <Button variant="outline" onClick={() => setIsPromotionDialogOpen(false)}>
                           Cancel
                         </Button>
-                        <Button onClick={handlePromoteStudents}>Promote Students</Button>
+                        <Button onClick={handlePromoteStudents}>
+                          Promote Selected Students
+                        </Button>
                       </div>
                     </DialogContent>
                   </Dialog>
+
                   <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                     <DialogTrigger asChild>
                       <Button>
@@ -430,21 +428,172 @@ const StudentManagement = () => {
                         Add Student
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-md">
+                    <DialogContent className="max-w-2xl">
                       <DialogHeader>
                         <DialogTitle>Add New Student</DialogTitle>
                         <DialogDescription>
-                          Enter student details
+                          Enter student details and assign RFID card
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="space-y-4">
-                        <p>Add student form coming soon...</p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="admissionNumber">Admission Number</Label>
+                          <Input
+                            id="admissionNumber"
+                            value={formData.admissionNumber}
+                            onChange={(e) => setFormData(prev => ({ ...prev, admissionNumber: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="name">Full Name</Label>
+                          <Input
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="fatherName">Father's Name</Label>
+                          <Input
+                            id="fatherName"
+                            value={formData.fatherName}
+                            onChange={(e) => setFormData(prev => ({ ...prev, fatherName: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="motherName">Mother's Name</Label>
+                          <Input
+                            id="motherName"
+                            value={formData.motherName}
+                            onChange={(e) => setFormData(prev => ({ ...prev, motherName: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="class">Class</Label>
+                          <Select value={formData.class} onValueChange={(value) => setFormData(prev => ({ ...prev, class: value }))}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Class" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {getClassOrder().map(cls => (
+                                <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="section">Section</Label>
+                          <Select value={formData.section} onValueChange={(value) => setFormData(prev => ({ ...prev, section: value }))}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Section" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {['A', 'B', 'C', 'D'].map(section => (
+                                <SelectItem key={section} value={section}>{section}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="mobile">Mobile Number</Label>
+                          <Input
+                            id="mobile"
+                            type="tel"
+                            value={formData.mobileNumber}
+                            onChange={(e) => setFormData(prev => ({ ...prev, mobileNumber: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="rfidCard">RFID Card Number</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="rfidCard"
+                              value={formData.rfidCardNumber}
+                              onChange={(e) => setFormData(prev => ({ ...prev, rfidCardNumber: e.target.value }))}
+                              placeholder="Scan or enter card number"
+                            />
+                            <Button 
+                              type="button" 
+                              variant="outline"
+                              onClick={() => {
+                                setIsRfidScanOpen(true);
+                                setSelectedStudentForCard(null);
+                              }}
+                            >
+                              <CreditCard className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="walletBalance">Initial Wallet Balance</Label>
+                          <Input
+                            id="walletBalance"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={formData.walletBalance}
+                            onChange={(e) => setFormData(prev => ({ ...prev, walletBalance: parseFloat(e.target.value) || 0 }))}
+                          />
+                        </div>
                       </div>
                       <div className="flex justify-end space-x-2">
                         <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                           Cancel
                         </Button>
-                        <Button onClick={() => setIsAddDialogOpen(false)}>
+                        <Button onClick={() => {
+                          const newStudent: Student = {
+                            id: Date.now().toString(),
+                            ...formData,
+                            isActive: true,
+                            rfidCardHistory: [{
+                              id: Date.now().toString(),
+                              cardNumber: formData.rfidCardNumber,
+                              action: 'issued',
+                              timestamp: new Date(),
+                              processedBy: 'Admin'
+                            }],
+                            weeklySpendingLimits: {
+                              tuckShop: 500,
+                              dryFoodShop: 300,
+                              generalStore: 200
+                            },
+                            currentWeekSpending: {
+                              tuckShop: 0,
+                              dryFoodShop: 0,
+                              generalStore: 0
+                            }
+                          };
+                          
+                          setStudents(prev => [...prev, newStudent]);
+                          setFormData({
+                            admissionNumber: '',
+                            name: '',
+                            fatherName: '',
+                            motherName: '',
+                            mobileNumber: '',
+                            email: '',
+                            class: '',
+                            section: '',
+                            session: '2024-25',
+                            photoUrl: '',
+                            rfidCardNumber: '',
+                            walletBalance: 0
+                          });
+                          setIsAddDialogOpen(false);
+                          toast({
+                            title: "Student Added",
+                            description: `${newStudent.name} has been added successfully.`,
+                          });
+                        }}>
                           Add Student
                         </Button>
                       </div>
@@ -454,76 +603,295 @@ const StudentManagement = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="mb-4 flex gap-4">
-                <Input
-                  placeholder="Search students..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="max-w-sm"
-                />
+              <div className="space-y-4">
+                {/* Filters */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Input
+                    placeholder="Search students..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <Select value={classFilter} onValueChange={setClassFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filter by Class" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Classes</SelectItem>
+                      {getClassOrder().map(cls => (
+                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={sectionFilter} onValueChange={setSectionFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filter by Section" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Sections</SelectItem>
+                      {['A', 'B', 'C', 'D'].map(section => (
+                        <SelectItem key={section} value={section}>Section {section}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Students Table */}
+                <div className="border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Student</TableHead>
+                        <TableHead>Class & Section</TableHead>
+                        <TableHead>RFID Card</TableHead>
+                        <TableHead>Wallet Balance</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredStudents.map((student) => (
+                        <TableRow key={student.id}>
+                          <TableCell>
+                            <div className="flex items-center space-x-3">
+                              <Avatar>
+                                <AvatarImage src={student.photoUrl} />
+                                <AvatarFallback>{student.name.slice(0, 2)}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div className="font-medium">{student.name}</div>
+                                <div className="text-sm text-muted-foreground">
+                                  Adm: {student.admissionNumber}
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">Class {student.class}-{student.section}</div>
+                              <div className="text-sm text-muted-foreground">Session: {student.session}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <Badge variant={student.rfidCardNumber ? "default" : "secondary"}>
+                                {student.rfidCardNumber || "No Card"}
+                              </Badge>
+                              {!student.rfidCardNumber && (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => {
+                                    setSelectedStudentForCard(student);
+                                    setIsRfidScanOpen(true);
+                                  }}
+                                >
+                                  <CreditCard className="h-4 w-4 mr-1" />
+                                  Assign
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="font-medium">₹{student.walletBalance.toFixed(2)}</div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={student.isActive ? "default" : "secondary"}>
+                              {student.isActive ? "Active" : "Inactive"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      onClick={() => {
+                                        setSelectedStudentForHistory(student);
+                                        setIsHistoryDialogOpen(true);
+                                      }}
+                                    >
+                                      <History className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    Card History
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <Button size="sm" variant="outline">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Student</TableHead>
-                    <TableHead>Class/Section</TableHead>
-                    <TableHead>RFID Card</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredStudents.map((student) => (
-                    <TableRow key={student.id}>
-                      <TableCell>
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={student.photoUrl} />
-                            <AvatarFallback>{student.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{student.name}</p>
-                            <p className="text-sm text-muted-foreground">{student.admissionNumber}</p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>Class {student.class}-{student.section}</TableCell>
-                      <TableCell>
-                        <Badge variant={student.isActive ? "default" : "secondary"}>
-                          {student.rfidCardNumber}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={student.isActive ? "default" : "secondary"}>
-                          {student.isActive ? 'Active' : 'Inactive'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button size="sm" variant="outline">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
             </CardContent>
           </Card>
+
+          {/* RFID Scan Dialog */}
+          <Dialog open={isRfidScanOpen} onOpenChange={setIsRfidScanOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  {selectedStudentForCard ? `Assign RFID Card to ${selectedStudentForCard.name}` : 'Scan RFID Card'}
+                </DialogTitle>
+                <DialogDescription>
+                  Hold an RFID card near the scanner or enter the card number manually
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="text-center p-8 border-2 border-dashed border-gray-300 rounded-lg">
+                  <CreditCard className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <p className="text-lg font-medium mb-2">Place card on scanner</p>
+                  <p className="text-sm text-muted-foreground">Or enter card number below</p>
+                </div>
+                
+                <div>
+                  <Label htmlFor="scannedCardNumber">Card Number</Label>
+                  <Input
+                    id="scannedCardNumber"
+                    placeholder="Enter card number"
+                    value={scannedCard?.id || ''}
+                    onChange={(e) => setScannedCard({ id: e.target.value, isActive: true })}
+                  />
+                </div>
+
+                {scannedCard?.id && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <span className="font-medium">Card: {scannedCard.id}</span>
+                      <Badge variant={scannedCard.isActive ? "default" : "destructive"}>
+                        {scannedCard.isActive ? "Available" : "In Use"}
+                      </Badge>
+                    </div>
+                    
+                    {!scannedCard.isActive && scannedCard.previousOwner && (
+                      <p className="text-sm text-orange-600">
+                        This card was previously assigned to {scannedCard.previousOwner}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => {
+                  setIsRfidScanOpen(false);
+                  setScannedCard(null);
+                  setSelectedStudentForCard(null);
+                }}>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (scannedCard?.id && selectedStudentForCard) {
+                      // Assign card to student
+                      setStudents(prev => prev.map(s => 
+                        s.id === selectedStudentForCard.id 
+                          ? { 
+                              ...s, 
+                              rfidCardNumber: scannedCard.id,
+                              rfidCardHistory: [...s.rfidCardHistory, {
+                                id: Date.now().toString(),
+                                cardNumber: scannedCard.id,
+                                action: 'issued',
+                                timestamp: new Date(),
+                                processedBy: 'Admin'
+                              }]
+                            } 
+                          : s
+                      ));
+                      
+                      toast({
+                        title: "Card Assigned",
+                        description: `RFID card ${scannedCard.id} assigned to ${selectedStudentForCard.name}`,
+                      });
+                      
+                      setIsRfidScanOpen(false);
+                      setScannedCard(null);
+                      setSelectedStudentForCard(null);
+                    } else if (scannedCard?.id && !selectedStudentForCard) {
+                      // New student card assignment during add
+                      setFormData(prev => ({ ...prev, rfidCardNumber: scannedCard.id }));
+                      setIsRfidScanOpen(false);
+                      setScannedCard(null);
+                    }
+                  }}
+                  disabled={!scannedCard?.id}
+                >
+                  Assign Card
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Card History Dialog */}
+          <Dialog open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>RFID Card History - {selectedStudentForHistory?.name}</DialogTitle>
+                <DialogDescription>
+                  Complete history of RFID card assignments and changes
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                {selectedStudentForHistory?.rfidCardHistory.map((history, index) => (
+                  <div key={history.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <Badge variant={
+                          history.action === 'issued' ? 'default' : 
+                          history.action === 'deactivated' ? 'destructive' : 'secondary'
+                        }>
+                          {history.action}
+                        </Badge>
+                        <span className="font-medium">Card: {history.cardNumber}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4 mr-1" />
+                        {history.timestamp.toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Processed by: {history.processedBy}
+                      {history.reason && <div>Reason: {history.reason}</div>}
+                      {history.previousOwner && <div>Previous owner: {history.previousOwner}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
-        
+
         <TabsContent value="bulk-upload" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Bulk Upload Students</CardTitle>
-              <CardDescription>Upload student data via CSV file</CardDescription>
+              <CardTitle className="flex items-center">
+                <Upload className="h-5 w-5 mr-2" />
+                Bulk Student Upload
+              </CardTitle>
+              <CardDescription>
+                Upload multiple students using CSV file
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <p>Bulk upload feature coming soon...</p>
+              <div className="text-center p-8 border-2 border-dashed border-gray-300 rounded-lg">
+                <Upload className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                <p className="text-lg font-medium mb-2">Upload CSV File</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Select a CSV file with student data to upload
+                </p>
+                <Button>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Choose File
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -535,17 +903,17 @@ const StudentManagement = () => {
           <DialogHeader>
             <DialogTitle>Add New Session</DialogTitle>
             <DialogDescription>
-              Create a new academic session for student promotion
+              Create a new academic session with start and end dates.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="session-name">Session Name</Label>
+              <Label htmlFor="newSession">Session Name</Label>
               <Input
-                id="session-name"
-                placeholder="e.g., 2026-27"
+                id="newSession"
                 value={newSession}
                 onChange={(e) => setNewSession(e.target.value)}
+                placeholder="e.g. 2025-26"
               />
             </div>
             
