@@ -438,7 +438,7 @@ const StudentManagement = () => {
                             </DialogDescription>
                           </div>
                           {formData.photoUrl && (
-                            <div className="flex-shrink-0">
+                            <div className="flex-shrink-0 mr-8">
                               <img 
                                 src={formData.photoUrl} 
                                 alt="Student preview" 
