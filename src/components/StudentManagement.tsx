@@ -698,9 +698,6 @@ const StudentManagement = () => {
             }}
             className="cursor-pointer"
           />
-          {photoFile && (
-            <p className="text-sm text-muted-foreground mt-1">Selected: {photoFile.name}</p>
-          )}
         </div>
       </div>
       
