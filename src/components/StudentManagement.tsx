@@ -534,6 +534,36 @@ const StudentManagement = () => {
                           </div>
                         </div>
                         <div>
+                          <Label htmlFor="photo">Student Photo</Label>
+                          <Input
+                            id="photo"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onload = (event) => {
+                                  setFormData(prev => ({ 
+                                    ...prev, 
+                                    photoUrl: event.target?.result as string 
+                                  }));
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                          {formData.photoUrl && (
+                            <div className="mt-2">
+                              <img 
+                                src={formData.photoUrl} 
+                                alt="Student preview" 
+                                className="w-20 h-20 object-cover rounded-lg border"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div>
                           <Label htmlFor="walletBalance">Initial Wallet Balance</Label>
                           <Input
                             id="walletBalance"
