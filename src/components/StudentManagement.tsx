@@ -863,7 +863,7 @@ const StudentManagement = () => {
                         </div>
                         {/* Photo Preview in Header */}
                         {(photoFile || formData.photoUrl) && (
-                          <div className="flex flex-col items-center space-y-2">
+                          <div className="flex flex-col items-center space-y-2 mr-8">
                             <p className="text-xs text-muted-foreground">
                               {photoFile ? 'New Photo' : 'Current Photo'}
                             </p>
@@ -1675,7 +1675,7 @@ const StudentManagement = () => {
               </div>
               {/* Photo Preview in Header */}
               {(photoFile || formData.photoUrl) && (
-                <div className="flex flex-col items-center space-y-2">
+                <div className="flex flex-col items-center space-y-2 mr-8">
                   <p className="text-xs text-muted-foreground">
                     {photoFile ? 'New Photo' : 'Current Photo'}
                   </p>
