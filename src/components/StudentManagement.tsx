@@ -430,10 +430,23 @@ const StudentManagement = () => {
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl">
                       <DialogHeader>
-                        <DialogTitle>Add New Student</DialogTitle>
-                        <DialogDescription>
-                          Enter student details and assign RFID card
-                        </DialogDescription>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <DialogTitle>Add New Student</DialogTitle>
+                            <DialogDescription>
+                              Enter student details and assign RFID card
+                            </DialogDescription>
+                          </div>
+                          {formData.photoUrl && (
+                            <div className="flex-shrink-0">
+                              <img 
+                                src={formData.photoUrl} 
+                                alt="Student preview" 
+                                className="w-16 h-16 object-cover rounded-lg border"
+                              />
+                            </div>
+                          )}
+                        </div>
                       </DialogHeader>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -553,15 +566,6 @@ const StudentManagement = () => {
                               }
                             }}
                           />
-                          {formData.photoUrl && (
-                            <div className="mt-2">
-                              <img 
-                                src={formData.photoUrl} 
-                                alt="Student preview" 
-                                className="w-20 h-20 object-cover rounded-lg border"
-                              />
-                            </div>
-                          )}
                         </div>
                         <div>
                           <Label htmlFor="walletBalance">Initial Wallet Balance</Label>
