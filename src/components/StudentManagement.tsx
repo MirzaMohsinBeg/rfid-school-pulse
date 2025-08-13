@@ -92,6 +92,142 @@ const StudentManagement = () => {
     return matchesSearch && matchesClass && matchesSection;
   });
 
+  // Get unique classes for promotion
+  const getUniqueClasses = () => {
+    const classes = [...new Set(students.map(s => s.class))];
+    return classes.sort((a, b) => {
+      const order = getClassOrder();
+      return order.indexOf(a) - order.indexOf(b);
+    });
+  };
+
+  // Get higher classes for promotion
+  const getHigherClasses = (currentClass: string) => {
+    const order = getClassOrder();
+    const currentIndex = order.indexOf(currentClass);
+    if (currentIndex === -1) return [];
+    return order.slice(currentIndex + 1);
+  };
+
+  // Add class promotion rule
+  const addClassPromotion = () => {
+    setPromotionData(prev => ({
+      ...prev,
+      classPromotions: [...prev.classPromotions, {
+        class: '',
+        promoteToClass: '',
+        selectedStudents: []
+      }]
+    }));
+  };
+
+  // Remove class promotion rule
+  const removeClassPromotion = (index: number) => {
+    setPromotionData(prev => ({
+      ...prev,
+      classPromotions: prev.classPromotions.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Update class promotion rule
+  const updateClassPromotion = (index: number, field: string, value: string) => {
+    setPromotionData(prev => ({
+      ...prev,
+      classPromotions: prev.classPromotions.map((promotion, i) => 
+        i === index ? { ...promotion, [field]: value, selectedStudents: field === 'class' ? [] : promotion.selectedStudents } : promotion
+      )
+    }));
+  };
+
+  // Toggle student selection for promotion
+  const toggleStudentSelection = (promotionIndex: number, studentId: string) => {
+    setPromotionData(prev => ({
+      ...prev,
+      classPromotions: prev.classPromotions.map((promotion, i) => 
+        i === promotionIndex ? {
+          ...promotion,
+          selectedStudents: promotion.selectedStudents.includes(studentId)
+            ? promotion.selectedStudents.filter(id => id !== studentId)
+            : [...promotion.selectedStudents, studentId]
+        } : promotion
+      )
+    }));
+  };
+
+  // Select all students for a class
+  const selectAllStudentsForClass = (promotionIndex: number, selectAll: boolean) => {
+    const promotion = promotionData.classPromotions[promotionIndex];
+    const studentsInClass = students.filter(s => 
+      s.session === promotionData.fromSession && s.class === promotion.class
+    );
+    
+    setPromotionData(prev => ({
+      ...prev,
+      classPromotions: prev.classPromotions.map((p, i) => 
+        i === promotionIndex ? {
+          ...p,
+          selectedStudents: selectAll ? studentsInClass.map(s => s.id) : []
+        } : p
+      )
+    }));
+  };
+
+  // Handle student promotion
+  const handlePromoteStudents = () => {
+    const { toast } = useToast();
+    
+    let totalPromoted = 0;
+    
+    promotionData.classPromotions.forEach(promotion => {
+      if (promotion.selectedStudents.length > 0) {
+        const studentsToUpdate = students.filter(s => promotion.selectedStudents.includes(s.id));
+        
+        studentsToUpdate.forEach(student => {
+          if (promotion.promoteToClass === 'GRADUATED') {
+            // Mark as graduated - could move to separate graduated students list
+            totalPromoted++;
+          } else {
+            // Update student's class and session
+            setStudents(prev => prev.map(s => 
+              s.id === student.id ? {
+                ...s,
+                class: promotion.promoteToClass,
+                session: promotionData.toSession
+              } : s
+            ));
+            totalPromoted++;
+          }
+        });
+      }
+    });
+    
+    toast({
+      title: "Students Promoted Successfully",
+      description: `${totalPromoted} students have been promoted to ${promotionData.toSession}`,
+    });
+    
+    setIsPromotionDialogOpen(false);
+    // Reset promotion data
+    setPromotionData({
+      fromSession: '2024-25',
+      toSession: '2025-26',
+      classPromotions: []
+    });
+  };
+
+  // Add new session
+  const handleAddSession = () => {
+    if (newSession && !sessions.includes(newSession)) {
+      setSessions(prev => [...prev, newSession].sort());
+      setNewSession('');
+      setIsAddSessionDialogOpen(false);
+      toast({
+        title: "Session Added",
+        description: `Session ${newSession} has been added successfully.`,
+      });
+    }
+  };
+
   // Simple component that shows aligned buttons and basic structure
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -126,23 +262,150 @@ const StudentManagement = () => {
                         Promote Students
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-md">
+                    <DialogContent className="max-w-2xl">
                       <DialogHeader>
-                        <DialogTitle>Student Promotion</DialogTitle>
+                        <DialogTitle>Student Promotion/Rollover</DialogTitle>
                         <DialogDescription>
-                          Promote students to next class
+                          Promote students to the next academic session and class
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
-                        <p>Promotion feature coming soon...</p>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>From Session</Label>
+                            <Select value={promotionData.fromSession} onValueChange={(value) => 
+                              setPromotionData(prev => ({ ...prev, fromSession: value }))}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {sessions.map(session => (
+                                  <SelectItem key={session} value={session}>{session}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="flex items-center justify-between">
+                              To Session
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsAddSessionDialogOpen(true)}
+                                className="h-6 px-2 text-xs"
+                              >
+                                <Plus className="h-3 w-3 mr-1" />
+                                Add Session
+                              </Button>
+                            </Label>
+                            <Select value={promotionData.toSession} onValueChange={(value) => 
+                              setPromotionData(prev => ({ ...prev, toSession: value }))}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {sessions.map(session => (
+                                  <SelectItem key={session} value={session}>{session}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <Label>Class Promotion Rules</Label>
+                            <Button size="sm" onClick={addClassPromotion}>Add Rule</Button>
+                          </div>
+                          {promotionData.classPromotions.map((promotion, index) => {
+                            const studentsInClass = students.filter(s => 
+                              s.session === promotionData.fromSession && s.class === promotion.class
+                            );
+                            const higherClasses = getHigherClasses(promotion.class);
+                            
+                            return (
+                              <div key={index} className="border rounded-lg p-4 space-y-3 mb-4">
+                                <div className="flex gap-2 items-center">
+                                  <Select value={promotion.class} onValueChange={(value) => 
+                                    updateClassPromotion(index, 'class', value)}>
+                                    <SelectTrigger className="flex-1">
+                                      <SelectValue placeholder="From Class" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getUniqueClasses().map(cls => (
+                                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <span>→</span>
+                                  <Select value={promotion.promoteToClass} onValueChange={(value) => 
+                                    updateClassPromotion(index, 'promoteToClass', value)}>
+                                    <SelectTrigger className="flex-1">
+                                      <SelectValue placeholder="To Class" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {higherClasses.map(cls => (
+                                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                                      ))}
+                                      <SelectItem value="GRADUATED">Graduated</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button size="sm" variant="destructive" onClick={() => removeClassPromotion(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+
+                                {promotion.class && studentsInClass.length > 0 && (
+                                  <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <Label className="text-sm">Select Students to Promote ({promotion.selectedStudents.length}/{studentsInClass.length})</Label>
+                                      <div className="space-x-2">
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={() => selectAllStudentsForClass(index, true)}
+                                        >
+                                          Select All
+                                        </Button>
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={() => selectAllStudentsForClass(index, false)}
+                                        >
+                                          Clear All
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    <div className="max-h-32 overflow-y-auto border rounded p-2 space-y-1">
+                                      {studentsInClass.map(student => (
+                                        <div key={student.id} className="flex items-center space-x-2">
+                                          <input
+                                            type="checkbox"
+                                            checked={promotion.selectedStudents.includes(student.id)}
+                                            onChange={() => toggleStudentSelection(index, student.id)}
+                                            className="rounded"
+                                          />
+                                          <span className="text-sm">{student.name} (ID: {student.id})</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {promotion.class && studentsInClass.length === 0 && (
+                                  <p className="text-sm text-muted-foreground">No students found in Class {promotion.class} for session {promotionData.fromSession}</p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                       <div className="flex justify-end space-x-2">
                         <Button variant="outline" onClick={() => setIsPromotionDialogOpen(false)}>
                           Cancel
                         </Button>
-                        <Button onClick={() => setIsPromotionDialogOpen(false)}>
-                          Close
-                        </Button>
+                        <Button onClick={handlePromoteStudents}>Promote Students</Button>
                       </div>
                     </DialogContent>
                   </Dialog>
@@ -251,6 +514,35 @@ const StudentManagement = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Add Session Dialog */}
+      <Dialog open={isAddSessionDialogOpen} onOpenChange={setIsAddSessionDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Session</DialogTitle>
+            <DialogDescription>
+              Create a new academic session for student promotion
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="session-name">Session Name</Label>
+              <Input
+                id="session-name"
+                placeholder="e.g., 2026-27"
+                value={newSession}
+                onChange={(e) => setNewSession(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setIsAddSessionDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddSession}>Add Session</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
