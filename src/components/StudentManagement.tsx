@@ -864,13 +864,168 @@ const StudentManagement = () => {
                     Total Students: {students.length} | Active Cards: {students.filter(s => s.isActive).length}
                   </CardDescription>
                 </div>
-                <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Add Student
-                    </Button>
-                  </DialogTrigger>
+                <div className="flex gap-2">
+                  <Dialog open={isPromotionDialogOpen} onOpenChange={setIsPromotionDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Users className="h-4 w-4 mr-2" />
+                        Promote Students
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Student Promotion/Rollover</DialogTitle>
+                        <DialogDescription>
+                          Promote students to the next academic session and class
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label>From Session</Label>
+                            <Select value={promotionData.fromSession} onValueChange={(value) => 
+                              setPromotionData(prev => ({ ...prev, fromSession: value }))}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {sessions.map(session => (
+                                  <SelectItem key={session} value={session}>{session}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="flex items-center justify-between">
+                              To Session
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setIsAddSessionDialogOpen(true)}
+                                className="h-6 px-2 text-xs"
+                              >
+                                <Plus className="h-3 w-3 mr-1" />
+                                Add Session
+                              </Button>
+                            </Label>
+                            <Select value={promotionData.toSession} onValueChange={(value) => 
+                              setPromotionData(prev => ({ ...prev, toSession: value }))}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {sessions.map(session => (
+                                  <SelectItem key={session} value={session}>{session}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <Label>Class Promotion Rules</Label>
+                            <Button size="sm" onClick={addClassPromotion}>Add Rule</Button>
+                          </div>
+                          {promotionData.classPromotions.map((promotion, index) => {
+                            const studentsInClass = students.filter(s => 
+                              s.session === promotionData.fromSession && s.class === promotion.class
+                            );
+                            const higherClasses = getHigherClasses(promotion.class);
+                            
+                            return (
+                              <div key={index} className="border rounded-lg p-4 space-y-3 mb-4">
+                                <div className="flex gap-2 items-center">
+                                  <Select value={promotion.class} onValueChange={(value) => 
+                                    updateClassPromotion(index, 'class', value)}>
+                                    <SelectTrigger className="flex-1">
+                                      <SelectValue placeholder="From Class" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {getUniqueClasses().map(cls => (
+                                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <span>→</span>
+                                  <Select value={promotion.promoteToClass} onValueChange={(value) => 
+                                    updateClassPromotion(index, 'promoteToClass', value)}>
+                                    <SelectTrigger className="flex-1">
+                                      <SelectValue placeholder="To Class" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {higherClasses.map(cls => (
+                                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
+                                      ))}
+                                      <SelectItem value="GRADUATED">Graduated</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <Button size="sm" variant="destructive" onClick={() => removeClassPromotion(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+
+                                {promotion.class && studentsInClass.length > 0 && (
+                                  <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <Label className="text-sm">Select Students to Promote ({promotion.selectedStudents.length}/{studentsInClass.length})</Label>
+                                      <div className="space-x-2">
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={() => selectAllStudentsForClass(index, true)}
+                                        >
+                                          Select All
+                                        </Button>
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={() => selectAllStudentsForClass(index, false)}
+                                        >
+                                          Clear All
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    <div className="max-h-32 overflow-y-auto border rounded p-2 space-y-1">
+                                      {studentsInClass.map(student => (
+                                        <div key={student.id} className="flex items-center space-x-2">
+                                          <input
+                                            type="checkbox"
+                                            checked={promotion.selectedStudents.includes(student.id)}
+                                            onChange={() => toggleStudentSelection(index, student.id)}
+                                            className="rounded"
+                                          />
+                                          <span className="text-sm">{student.name} (ID: {student.id})</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {promotion.class && studentsInClass.length === 0 && (
+                                  <p className="text-sm text-muted-foreground">No students found in Class {promotion.class} for session {promotionData.fromSession}</p>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <div className="flex justify-end space-x-2">
+                        <Button variant="outline" onClick={() => setIsPromotionDialogOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={handlePromoteStudents}>Promote Students</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Add Student
+                      </Button>
+                    </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <div className="flex items-start justify-between">
@@ -1064,165 +1219,11 @@ const StudentManagement = () => {
                           )}
                         </TabsContent>
                       </Tabs>
-                    </DialogContent>
-                  </Dialog>
+                     </DialogContent>
+                   </Dialog>
+                 </div>
 
-                  <Dialog open={isPromotionDialogOpen} onOpenChange={setIsPromotionDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" className="ml-auto">
-                        <Users className="h-4 w-4 mr-2" />
-                        Promote Students
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                      <DialogHeader>
-                        <DialogTitle>Student Promotion/Rollover</DialogTitle>
-                        <DialogDescription>
-                          Promote students to the next academic session and class
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label>From Session</Label>
-                            <Select value={promotionData.fromSession} onValueChange={(value) => 
-                              setPromotionData(prev => ({ ...prev, fromSession: value }))}>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {sessions.map(session => (
-                                  <SelectItem key={session} value={session}>{session}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Label className="flex items-center justify-between">
-                              To Session
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setIsAddSessionDialogOpen(true)}
-                                className="h-6 px-2 text-xs"
-                              >
-                                <Plus className="h-3 w-3 mr-1" />
-                                Add Session
-                              </Button>
-                            </Label>
-                            <Select value={promotionData.toSession} onValueChange={(value) => 
-                              setPromotionData(prev => ({ ...prev, toSession: value }))}>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {sessions.map(session => (
-                                  <SelectItem key={session} value={session}>{session}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <Label>Class Promotion Rules</Label>
-                            <Button size="sm" onClick={addClassPromotion}>Add Rule</Button>
-                          </div>
-                          {promotionData.classPromotions.map((promotion, index) => {
-                            const studentsInClass = students.filter(s => 
-                              s.session === promotionData.fromSession && s.class === promotion.class
-                            );
-                            const higherClasses = getHigherClasses(promotion.class);
-                            
-                            return (
-                              <div key={index} className="border rounded-lg p-4 space-y-3 mb-4">
-                                <div className="flex gap-2 items-center">
-                                  <Select value={promotion.class} onValueChange={(value) => 
-                                    updateClassPromotion(index, 'class', value)}>
-                                    <SelectTrigger className="flex-1">
-                                      <SelectValue placeholder="From Class" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {getUniqueClasses().map(cls => (
-                                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                  <span>→</span>
-                                  <Select value={promotion.promoteToClass} onValueChange={(value) => 
-                                    updateClassPromotion(index, 'promoteToClass', value)}>
-                                    <SelectTrigger className="flex-1">
-                                      <SelectValue placeholder="To Class" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {higherClasses.map(cls => (
-                                        <SelectItem key={cls} value={cls}>Class {cls}</SelectItem>
-                                      ))}
-                                      <SelectItem value="GRADUATED">Graduated</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  <Button size="sm" variant="destructive" onClick={() => removeClassPromotion(index)}>
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-
-                                {promotion.class && studentsInClass.length > 0 && (
-                                  <div className="space-y-2">
-                                    <div className="flex items-center justify-between">
-                                      <Label className="text-sm">Select Students to Promote ({promotion.selectedStudents.length}/{studentsInClass.length})</Label>
-                                      <div className="space-x-2">
-                                        <Button 
-                                          size="sm" 
-                                          variant="outline"
-                                          onClick={() => selectAllStudentsForClass(index, true)}
-                                        >
-                                          Select All
-                                        </Button>
-                                        <Button 
-                                          size="sm" 
-                                          variant="outline"
-                                          onClick={() => selectAllStudentsForClass(index, false)}
-                                        >
-                                          Clear All
-                                        </Button>
-                                      </div>
-                                    </div>
-                                    <div className="max-h-32 overflow-y-auto border rounded p-2 space-y-1">
-                                      {studentsInClass.map(student => (
-                                        <div key={student.id} className="flex items-center space-x-2">
-                                          <input
-                                            type="checkbox"
-                                            checked={promotion.selectedStudents.includes(student.id)}
-                                            onChange={() => toggleStudentSelection(index, student.id)}
-                                            className="rounded"
-                                          />
-                                          <span className="text-sm">{student.name} (ID: {student.id})</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {promotion.class && studentsInClass.length === 0 && (
-                                  <p className="text-sm text-muted-foreground">No students found in Class {promotion.class} for session {promotionData.fromSession}</p>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                      <div className="flex justify-end space-x-2">
-                        <Button variant="outline" onClick={() => setIsPromotionDialogOpen(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={handlePromoteStudents}>Promote Students</Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-
-                  <Dialog open={isAddSessionDialogOpen} onOpenChange={setIsAddSessionDialogOpen}>
+                 <Dialog open={isAddSessionDialogOpen} onOpenChange={setIsAddSessionDialogOpen}>
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>Add New Session</DialogTitle>
@@ -1250,10 +1251,11 @@ const StudentManagement = () => {
                       </div>
                     </DialogContent>
                   </Dialog>
+                  </div>
                 </div>
-              </div>
-              
-              <Table>
+              </CardHeader>
+               <CardContent>
+               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Student</TableHead>
