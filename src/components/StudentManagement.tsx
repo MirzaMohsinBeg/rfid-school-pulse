@@ -704,9 +704,9 @@ const StudentManagement = () => {
         </div>
       </div>
       
-      {/* Photo Preview - Top Right Corner */}
+      {/* Photo Preview - Upper Left */}
       {(photoFile || (!photoFile && formData.photoUrl)) && (
-        <div className="absolute top-4 right-4 bg-background border border-border rounded-lg p-2 shadow-lg">
+        <div className="absolute top-4 left-4 bg-background border border-border rounded-lg p-2 shadow-lg">
           <p className="text-xs text-muted-foreground mb-2">
             {photoFile ? 'New Photo' : 'Current Photo'}
           </p>
