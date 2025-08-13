@@ -874,6 +874,9 @@ const StudentManagement = () => {
                                 className="w-full h-full object-cover"
                               />
                             </div>
+                            <p className="text-xs text-muted-foreground text-center max-w-32 truncate">
+                              {photoFile ? photoFile.name : formData.photoUrl}
+                            </p>
                           </div>
                         )}
                       </div>
@@ -1686,6 +1689,9 @@ const StudentManagement = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
+                  <p className="text-xs text-muted-foreground text-center max-w-32 truncate">
+                    {photoFile ? photoFile.name : formData.photoUrl}
+                  </p>
                 </div>
               )}
             </div>
