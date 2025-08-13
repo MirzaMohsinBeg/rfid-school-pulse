@@ -670,7 +670,7 @@ const StudentManagement = () => {
   const getUniqueSessions = () => [...new Set(students.map(s => s.session))].sort();
 
   const StudentForm = ({ isEdit = false }: { isEdit?: boolean }) => (
-    <div className="grid gap-4 py-4">
+    <div className="relative grid gap-4 py-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="admissionNumber">Admission Number *</Label>
@@ -699,31 +699,26 @@ const StudentManagement = () => {
             className="cursor-pointer"
           />
           {photoFile && (
-            <div className="mt-2">
-              <p className="text-sm text-muted-foreground mb-2">Selected: {photoFile.name}</p>
-              <div className="w-20 h-20 border border-border rounded-lg overflow-hidden">
-                <img 
-                  src={formData.photoUrl} 
-                  alt="Photo preview" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          )}
-          {!photoFile && formData.photoUrl && (
-            <div className="mt-2">
-              <p className="text-sm text-muted-foreground mb-2">Current photo:</p>
-              <div className="w-20 h-20 border border-border rounded-lg overflow-hidden">
-                <img 
-                  src={formData.photoUrl} 
-                  alt="Current photo" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground mt-1">Selected: {photoFile.name}</p>
           )}
         </div>
       </div>
+      
+      {/* Photo Preview - Top Right Corner */}
+      {(photoFile || (!photoFile && formData.photoUrl)) && (
+        <div className="absolute top-4 right-4 bg-background border border-border rounded-lg p-2 shadow-lg">
+          <p className="text-xs text-muted-foreground mb-2">
+            {photoFile ? 'New Photo' : 'Current Photo'}
+          </p>
+          <div className="w-16 h-16 border border-border rounded-lg overflow-hidden">
+            <img 
+              src={formData.photoUrl} 
+              alt="Photo preview" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      )}
       
       <div className="grid grid-cols-2 gap-4">
         <div>
