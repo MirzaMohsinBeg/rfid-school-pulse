@@ -72,6 +72,8 @@ const StudentManagement = () => {
     walletBalance: 0
   });
 
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+
   const filteredStudents = students.filter(student => {
     // Only show students from current session
     if (student.session !== currentSession) return false;
@@ -116,13 +118,14 @@ const StudentManagement = () => {
       rfidCardNumber: '',
       walletBalance: 0
     });
+    setPhotoFile(null);
   };
 
   const handleAddStudent = () => {
-    if (!formData.name || !formData.admissionNumber || !formData.class) {
+    if (!formData.name || !formData.admissionNumber || !formData.class || !photoFile) {
       toast({
         title: 'Validation Error',
-        description: 'Please fill in all required fields',
+        description: 'Please fill in all required fields including uploading a photo',
         variant: 'destructive'
       });
       return;
@@ -181,6 +184,12 @@ const StudentManagement = () => {
       return;
     }
 
+    // For editing, update photo URL only if a new file was uploaded
+    let finalPhotoUrl = formData.photoUrl;
+    if (photoFile) {
+      finalPhotoUrl = URL.createObjectURL(photoFile);
+    }
+
     const updatedStudent: Student = {
       ...selectedStudent,
       name: formData.name,
@@ -191,7 +200,7 @@ const StudentManagement = () => {
       fatherName: formData.fatherName,
       rfidCardNumber: formData.rfidCardNumber,
       walletBalance: formData.walletBalance,
-      photoUrl: formData.photoUrl
+      photoUrl: finalPhotoUrl
     };
 
     setStudents(prev => prev.map(student => 
@@ -491,6 +500,7 @@ const StudentManagement = () => {
       rfidCardNumber: student.rfidCardNumber,
       walletBalance: student.walletBalance
     });
+    setPhotoFile(null); // Reset photo file when editing
     setIsEditDialogOpen(true);
   };
 
@@ -672,13 +682,27 @@ const StudentManagement = () => {
           />
         </div>
         <div>
-          <Label htmlFor="photoUrl">Photo URL</Label>
+          <Label htmlFor="photo">Photo *</Label>
           <Input
-            id="photoUrl"
-            value={formData.photoUrl}
-            onChange={(e) => setFormData(prev => ({ ...prev, photoUrl: e.target.value }))}
-            placeholder="Enter photo URL (optional)"
+            id="photo"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setPhotoFile(file);
+                // Create a URL for preview
+                const photoUrl = URL.createObjectURL(file);
+                setFormData(prev => ({ ...prev, photoUrl }));
+              }
+            }}
+            className="cursor-pointer"
           />
+          {photoFile && (
+            <div className="mt-2">
+              <p className="text-sm text-muted-foreground">Selected: {photoFile.name}</p>
+            </div>
+          )}
         </div>
       </div>
       
