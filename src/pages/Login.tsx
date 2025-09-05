@@ -44,9 +44,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
           <div className="flex justify-center mb-4">
-            <div className="p-3 bg-primary rounded-full">
-              <Logo size="lg" className="text-primary-foreground" />
-            </div>
+            <Logo size="lg" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">The Doon School</h1>
           <h2 className="text-xl font-semibold text-primary">RFID Payment System</h2>

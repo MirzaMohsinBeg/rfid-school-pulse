@@ -1,5 +1,3 @@
-// Fallback logo component when image is not available
-import { School } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LogoProps {
@@ -10,15 +8,16 @@ interface LogoProps {
 const Logo = ({ className, size = 'md' }: LogoProps) => {
   const sizeClasses = {
     sm: 'h-6 w-6',
-    md: 'h-8 w-8',
+    md: 'h-8 w-8', 
     lg: 'h-12 w-12'
   };
 
-  // Temporary fallback until logo image is properly uploaded
   return (
-    <div className={cn('flex items-center justify-center bg-primary rounded-full', className)}>
-      <School className={cn(sizeClasses[size], 'text-primary-foreground')} />
-    </div>
+    <img 
+      src="/lovable-uploads/78cd1c1f-4fc8-4d7c-b1cd-7cdd7c5d1dc2.png"
+      alt="The Doon School Logo" 
+      className={cn(sizeClasses[size], 'object-contain', className)}
+    />
   );
 };
 
