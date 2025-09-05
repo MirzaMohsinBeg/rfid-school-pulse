@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, School, Users, Store, Settings } from 'lucide-react';
+import { Loader2, Users, Store, Settings } from 'lucide-react';
+import Logo from '@/components/ui/logo';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -44,10 +45,11 @@ const Login = () => {
         <div className="text-center space-y-2">
           <div className="flex justify-center mb-4">
             <div className="p-3 bg-primary rounded-full">
-              <School className="h-8 w-8 text-primary-foreground" />
+              <Logo size="lg" className="text-primary-foreground" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">RFID School System</h1>
+          <h1 className="text-3xl font-bold tracking-tight">The Doon School</h1>
+          <h2 className="text-xl font-semibold text-primary">RFID Payment System</h2>
           <p className="text-muted-foreground">Sign in to your account to continue</p>
         </div>
 

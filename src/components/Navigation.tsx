@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  CreditCard, 
   ShoppingCart, 
   Users, 
   BarChart3, 
@@ -16,6 +15,7 @@ import {
   LogOut,
   User
 } from 'lucide-react';
+import Logo from '@/components/ui/logo';
 
 interface NavigationProps {
   activeModule: string;
@@ -38,8 +38,8 @@ const Navigation = ({ activeModule, onModuleChange }: NavigationProps) => {
   return (
     <div className="w-64 bg-card border-r border-border p-4 space-y-2">
       <div className="mb-6">
-        <div className="flex items-center space-x-2 mb-2">
-          <CreditCard className="h-8 w-8 text-primary" />
+        <div className="flex items-center space-x-3 mb-2">
+          <Logo size="md" />
           <div>
             <h1 className="text-lg font-bold">RFID Payment</h1>
             <p className="text-xs text-muted-foreground">The Doon School</p>
