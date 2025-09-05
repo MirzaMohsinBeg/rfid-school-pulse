@@ -2,14 +2,16 @@ import { cn } from '@/lib/utils';
 
 interface LogoProps {
   className?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
 
 const Logo = ({ className, size = 'md' }: LogoProps) => {
   const sizeClasses = {
-    sm: 'h-6 w-6',
-    md: 'h-8 w-8', 
-    lg: 'h-12 w-12'
+    sm: 'h-6 w-auto',
+    md: 'h-8 w-auto', 
+    lg: 'h-12 w-auto',
+    xl: 'h-20 w-auto',
+    '2xl': 'h-32 w-auto'
   };
 
   return (

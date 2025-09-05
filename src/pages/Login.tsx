@@ -43,8 +43,8 @@ const Login = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-secondary/20 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
-          <div className="flex justify-center mb-4">
-            <Logo size="lg" />
+          <div className="flex justify-center mb-6">
+            <Logo size="2xl" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">The Doon School</h1>
           <h2 className="text-xl font-semibold text-primary">RFID Payment System</h2>
