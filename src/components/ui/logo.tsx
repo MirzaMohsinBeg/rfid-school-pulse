@@ -15,13 +15,11 @@ const Logo = ({ className, size = 'md' }: LogoProps) => {
   };
 
   return (
-    <div className="flex items-center justify-center">
-      <img 
-        src="/lovable-uploads/d323e619-2a25-48aa-a488-ef271a42dcbe.png"
-        alt="The Doon School Logo" 
-        className={cn(sizeClasses[size], 'object-contain bg-white/90 rounded-lg px-4 py-2 shadow-sm', className)}
-      />
-    </div>
+    <img 
+      src="/lovable-uploads/d323e619-2a25-48aa-a488-ef271a42dcbe.png"
+      alt="The Doon School Logo" 
+      className={cn(sizeClasses[size], 'object-contain', className)}
+    />
   );
 };
 
