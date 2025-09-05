@@ -14,7 +14,7 @@ const Logo = ({ className, size = 'md' }: LogoProps) => {
 
   return (
     <img 
-      src="/lovable-uploads/78cd1c1f-4fc8-4d7c-b1cd-7cdd7c5d1dc2.png"
+      src="/lovable-uploads/d323e619-2a25-48aa-a488-ef271a42dcbe.png"
       alt="The Doon School Logo" 
       className={cn(sizeClasses[size], 'object-contain', className)}
     />
