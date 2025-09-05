@@ -54,7 +54,7 @@ const Login = () => {
             <Logo size="2xl" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">RFID Payment System</h1>
-          <h2 className="text-xl font-semibold text-primary">RFID Payment System</h2>
+          
           <p className="text-muted-foreground">Sign in to your account to continue</p>
         </div>
 
