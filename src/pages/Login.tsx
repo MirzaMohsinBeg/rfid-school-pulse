@@ -61,7 +61,7 @@ const Login = () => {
         <Card>
           <CardHeader>
             <CardTitle>Login</CardTitle>
-            <CardDescription>Enter your credentials to access the system</CardDescription>
+            
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
